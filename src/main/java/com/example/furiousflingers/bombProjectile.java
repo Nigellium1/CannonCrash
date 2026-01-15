@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class bombProjectile extends MovableCircle{
 
-    private final double explosionRadius = 50;
+    private final double explosionRadius = 150;
     private boolean removeThisInstance;
 
     public bombProjectile(Vector position, Vector velocity, Vector acceleration, double radius, double orientation, double angularVelocity, Material material,String imageName) {
@@ -18,6 +18,9 @@ public class bombProjectile extends MovableCircle{
         //If collided
         if (!collisionInformationList.isEmpty()){
             for (Entity entity:entities){
+                if (entity.equals(this)){
+                    continue; //Skip itself the bomb
+                }
                 //Push all movables within radius away
                 if (entity instanceof Movable){
                     Vector thisToEntityVector = entity.position.subtract(position);
@@ -25,7 +28,7 @@ public class bombProjectile extends MovableCircle{
                     //If within radius
 
                     if (thisToEntityMagnitude<explosionRadius){
-                        ((Movable)entity).velocity.add(thisToEntityVector.scalarMultiply(1000*thisToEntityMagnitude/explosionRadius));
+                        ((Movable)entity).velocity = ((Movable)entity).velocity.add(thisToEntityVector.scalarMultiply(5*thisToEntityMagnitude/explosionRadius));
                     }
                 }
             }

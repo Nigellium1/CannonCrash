@@ -19,18 +19,18 @@ public abstract class Movable extends Entity {
 
     public void standardUpdate(double time) {
 
-//        if (velocity.magnitude()<15&&Math.abs(angularVelocity)<0.2){
-//            numberOfDormantCycles++;
-//        } else {
-//            numberOfDormantCycles = 0;
-//            acceleration = new Vector(0,1000);
-//        }
-//
-//        if (numberOfDormantCycles>9){
-//            velocity = new Vector(0,0);
-//            angularVelocity = 0;
-//            acceleration = new Vector(0,0);
-//        }
+        if (velocity.magnitude()<15&&Math.abs(angularVelocity)<0.2){
+            numberOfDormantCycles++;
+        } else {
+            numberOfDormantCycles = 0;
+            acceleration = new Vector(0,1000);
+        }
+
+        if (numberOfDormantCycles>9){
+            velocity = new Vector(0,0);
+            angularVelocity = 0;
+            acceleration = new Vector(0,0);
+        }
         //NEED EXTRA CHECK, DURING COLLISION DETECTION, STORE "SUPPORT AREA", THEN HERE CHECK IF COM PROJECTED ONTO THAT LINE IS INSIDE, IF INSIDE THEN STABLE OTHERWISE ITS A DIAMOND PIVOT
 
         //Updates velocity and position by multiplying their rate of change by the time passed
