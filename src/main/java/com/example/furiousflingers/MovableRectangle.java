@@ -1,12 +1,15 @@
 package com.example.furiousflingers;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class MovableRectangle extends Movable implements Rectangle {
 
-    private final javafx.scene.shape.Rectangle rectangle;
+    private final ImageView rectangleView;
     private final double width;
     private final double height;
     private Vector[] vertices = new Vector[4]; //0 - top left, 1 top right, 2 bottom right, 3 bottom left
@@ -16,22 +19,21 @@ public class MovableRectangle extends Movable implements Rectangle {
         super(position,velocity,acceleration, orientation, angularVelocity, material);
         this.width = width;
         this.height = height;
-        rectangle = new javafx.scene.shape.Rectangle(position.getX(),position.getY(),width,height);
-        rectangle.setFill(Color.CYAN);
+        rectangleView = importImage(material.getImageName());
         vertices[0] = position.add(new Vector(-width/2,-height/2));
         vertices[1] = position.add(new Vector(width/2,-height/2));
         vertices[2] = position.add(new Vector(width/2,height/2));
         vertices[3] = position.add(new Vector(-width/2,height/2));
     }
 
-    public javafx.scene.shape.Rectangle getRectangle() {
-        return rectangle;
+    public ImageView getRectangle() {
+        return rectangleView;
     }
 
     public void updateAppearance (){
-        rectangle.setX(position.getX()-width/2); //Rectangle shape position is top left corner so I take my center of mass and subtract half width and height to get top left corner
-        rectangle.setY(position.getY()-height/2);
-        rectangle.setRotate(-orientation*(180/Math.PI));
+        rectangleView.setX(position.getX()-width/2); //Rectangle shape position is top left corner so I take my center of mass and subtract half width and height to get top left corner
+        rectangleView.setY(position.getY()-height/2);
+        rectangleView.setRotate(-orientation*(180/Math.PI));
     }
 
     public ArrayList detectCollisions(ArrayList<Entity> entities){
@@ -255,6 +257,18 @@ public class MovableRectangle extends Movable implements Rectangle {
     @Override
     public double getHeight() {
         return height;
+    }
+
+    public ImageView importImage(String imageName) {
+        try {
+            InputStream inputStream = this.getClass().getResourceAsStream(imageName);
+            Image image = new Image(inputStream);
+            return new ImageView(image);
+        } catch (Exception importingCircleImage) {
+            System.out.println("Error importing rectangle image");
+            importingCircleImage.printStackTrace();
+            return null;
+        }
     }
 }
 

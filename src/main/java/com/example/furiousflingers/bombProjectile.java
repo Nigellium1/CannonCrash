@@ -43,7 +43,7 @@ public class bombProjectile extends MovableCircle{
         //Updates the visible position of the node on the screen
         circleView.setX(position.getX()-41); //Cus imageview coords are top left, bomb has little sticky out bit so not radius
         circleView.setY(position.getY()-41);
-        circleView.setRotate(orientation*(180/Math.PI));
+        circleView.setRotate(-orientation*(180/Math.PI));
     }
 
     public boolean isRemoveThisInstance() {

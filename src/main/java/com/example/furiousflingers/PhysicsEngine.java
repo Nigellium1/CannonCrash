@@ -138,13 +138,13 @@ public class PhysicsEngine implements ProjectileSpawner{
     public void addClickFunctionality (Launcher launcher){
         physicsEnginePane.setOnMousePressed(event -> {
             launcher.handleMousePress(event,projectile);
-//            if (event.isPrimaryButtonDown()){
-//                addMovableCircle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
-//                        0, 0, Material.WOOD);
-//            }
+            if (event.isPrimaryButtonDown()){
+                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
+                        120,60,0,Material.STONE);
+            }
             if (event.isSecondaryButtonDown()){
                 addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
-                        128,64,0,Material.WOOD);
+                        120,60,0,Material.WOOD);
             }
         });
 
