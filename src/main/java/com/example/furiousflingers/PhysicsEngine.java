@@ -13,12 +13,14 @@ public class PhysicsEngine implements ProjectileSpawner{
     private final double sceneHeight;
     private Pane physicsEnginePane;
     private ArrayList<Entity> entities;
-    private String launcher;
+    private ArrayList<Coin> coins;
+    private LauncherType launcher;
     private ProjectileType   projectile;
 
     public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation){
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
+        entities = new ArrayList<>();
         launcher = loadoutInformation.getLauncher();
         projectile = loadoutInformation.getProjectile();
         physicsEnginePane = new Pane();
@@ -29,9 +31,9 @@ public class PhysicsEngine implements ProjectileSpawner{
         return physicsEnginePane;
     }
 
-    public void start() throws Exception {
-        entities = new ArrayList<>();
+    public void start(int levelNumber) throws Exception {
         addGround();
+        addLevel(levelNumber);
 
         AnimationTimer animationTimer = new AnimationTimer() {
             //Placeholder till start time is set
@@ -75,8 +77,8 @@ public class PhysicsEngine implements ProjectileSpawner{
 
                 //Check for entities (projectiles) that need removing
                 for (int i = 0; i < entities.size(); i++) {
-                    if (entities.get(i) instanceof bombProjectile) {
-                        if (((bombProjectile) entities.get(i)).isRemoveThisInstance()) {
+                    if (entities.get(i) instanceof BombProjectile) {
+                        if (((BombProjectile) entities.get(i)).isRemoveThisInstance()) {
                             removeEntity(i);
                             i--;
                         }
@@ -186,8 +188,10 @@ public class PhysicsEngine implements ProjectileSpawner{
         physicsEnginePane.getChildren().remove(index+differenceInListSizes); //Pane includes launcher which isn't part of entities so lists are out of sync by 1
         entities.remove(index);
     }
+
+    public void addLevel (int levelNumber) {
+
+    }
 }
 
-//PROBLEMS, DOUBLE COLLISION POINTS IN OPPOSITE DIRECTIONS BECAUSE OF FURTHEST IN COLLISION NORMAL
-//Y SEEMS TO GROW INFINITELY??
-//REMEMBER YOU ADDED ANOTHER LAUNCHER SO DESPAWNING IS BROKEN-
+//DO LEVELS

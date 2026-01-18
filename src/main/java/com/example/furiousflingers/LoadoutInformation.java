@@ -2,19 +2,19 @@ package com.example.furiousflingers;
 
 public class LoadoutInformation {
 
-    private String launcher;
+    private LauncherType launcher;
     private ProjectileType projectile;
 
-    public LoadoutInformation(String launcher, ProjectileType projectile) {
+    public LoadoutInformation(LauncherType launcher, ProjectileType projectile) {
         this.launcher = launcher;
         this.projectile = projectile;
     }
 
-    public String getLauncher() {
+    public LauncherType getLauncher() {
         return launcher;
     }
 
-    public void setLauncher(String launcher) {
+    public void setLauncher(LauncherType launcher) {
         this.launcher = launcher;
     }
 

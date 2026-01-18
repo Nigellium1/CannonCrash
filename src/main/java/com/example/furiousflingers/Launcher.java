@@ -35,12 +35,12 @@ public class Launcher {
             return;
         }
         isProjectileLive = true;
-        if (projectile.getIndex()==2){
+        if (projectile == ProjectileType.BOMB){
             //Actual image radius is 28 but it looks better if hitbox is slightly smaller than image (no gaps)
-            currentProjectile = new bombProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
+            currentProjectile = new BombProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
                     Material.STONE,"bombProjectile.png");
         } else {
-            currentProjectile = new MovableCircle(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
+            currentProjectile = new Projectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
                     Material.STONE, "defaultProjectile.png");
         }
         projectileSpawner.addMovableCircle(currentProjectile);

@@ -15,7 +15,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Scanner;
 
 public class FuriousFlingers extends Application {
 
@@ -37,8 +43,8 @@ public class FuriousFlingers extends Application {
     public BorderPane setupStartPane(StackPane basePane) {
         BorderPane startPane = new BorderPane();
         Button playButton = createButton("playButton.png");
-        LoadoutInformation loadoutInformation = new LoadoutInformation("default",ProjectileType.DEFAULT);
         playButton.setOnAction(event -> {
+                    LoadoutInformation loadoutInformation = importLoadoutInformation();
                     BorderPane menuPane = setupMenuPane(basePane, loadoutInformation);
                     basePane.getChildren().set(1, menuPane); //Change current pane for new menu pane
                 }
@@ -89,26 +95,28 @@ public class FuriousFlingers extends Application {
         int levelCounter = 0;
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 5; j++) {
-                if (levelCounter>levelsUnlocked){
+                if (levelCounter > levelsUnlocked) {
                     //Stack lock image over level image
                     ImageView lock = importImage("lock.png");
                     ImageView level = importImage(levelCounter + ".png");
                     level.setOpacity(0.70); //Fade the level
-                    StackPane.setAlignment(lock,Pos.TOP_RIGHT); //Put lock in top right
-                     //Small margin
-                    StackPane combinedImages = new StackPane(level,lock);
-                    buttonsWindow.add(combinedImages,j,i);
+                    StackPane.setAlignment(lock, Pos.TOP_RIGHT); //Put lock in top right
+                    //Small margin
+                    StackPane combinedImages = new StackPane(level, lock);
+                    buttonsWindow.add(combinedImages, j, i);
                     levelCounter++;
                     continue;
                 }
 
                 Button levelButton = createButton(levelCounter + ".png");
                 levelCounter++;
+                int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
                 levelButton.setOnAction(event -> {
-                    PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(), levelButton.getScene().getHeight(), loadoutInformation);
+                    PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(),
+                            levelButton.getScene().getHeight(), loadoutInformation);
                     basePane.getChildren().set(1, physicsEngine.getPhysicsEnginePane());
                     try {
-                        physicsEngine.start();
+                        physicsEngine.start(levelNumber);
                     } catch (Exception startingPhysicsEngine) {
                         System.out.println("Error starting physics engine");
                         startingPhysicsEngine.printStackTrace();
@@ -143,10 +151,10 @@ public class FuriousFlingers extends Application {
         }
 
         GridPane projectileGrid = new GridPane();
-        addLoadoutSelection(ProjectileType.DEFAULT,projectileGrid,0,0,loadoutInformation,"defaultProjectile.png");
-        addLoadoutSelection(ProjectileType.MAGNETIC,projectileGrid,0,1,loadoutInformation,"magneticProjectile.png");
-        addLoadoutSelection(ProjectileType.BOMB,projectileGrid,1,0,loadoutInformation,"bombProjectile.png");
-        addLoadoutSelection(ProjectileType.NERD,projectileGrid,1,1,loadoutInformation,"nerdProjectile.png");
+        addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, 0, 0, loadoutInformation, "defaultProjectile.png");
+        addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
+        addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
+        addLoadoutSelection(ProjectileType.NERD, projectileGrid, 1, 1, loadoutInformation, "nerdProjectile.png");
 
 //        for (int i = 0; i < projectileGrid.getChildren().size(); i++) {
 //            if (projectileGrid.getChildren().get(i).)
@@ -162,15 +170,15 @@ public class FuriousFlingers extends Application {
         return loadoutPane;
     }
 
-    public void addLoadoutSelection (ProjectileType projectile, GridPane grid, int i, int j, LoadoutInformation loadoutInformation, String imagePath){
+    public void addLoadoutSelection(ProjectileType projectile, GridPane grid, int i, int j, LoadoutInformation loadoutInformation, String imagePath) {
         ImageView background = importImage("loadoutBackground.png"); //Same background for projectiles and launchers
         ImageView loadoutChoice = importImage(imagePath);
-        StackPane combinedImages = new StackPane(background,loadoutChoice);
+        StackPane combinedImages = new StackPane(background, loadoutChoice);
         Button button = createButton(combinedImages);
         button.setOnAction(event -> {
             loadoutInformation.setProjectile(projectile);
         });
-        grid.add(button,i,j);
+        grid.add(button, i, j);
     }
 
     public Button createButton(String imageName) {
@@ -200,12 +208,12 @@ public class FuriousFlingers extends Application {
         }
     }
 
-    public void addShadows (Button button){
+    public void addShadows(Button button) {
         DropShadow shadow = new DropShadow();
         shadow.setRadius(0);   //No smooth shadow
         shadow.setOffsetX(2);
         shadow.setOffsetY(2);
-        shadow.setColor(Color.rgb(80,80,80));
+        shadow.setColor(Color.rgb(80, 80, 80));
 
         button.setOnMouseEntered(e -> {
             button.setEffect(shadow);
@@ -217,6 +225,69 @@ public class FuriousFlingers extends Application {
             button.setTranslateX(2);
             button.setTranslateY(2);
         });
+    }
+    //^AI, google
+
+    public LoadoutInformation importLoadoutInformation (){
+        LoadoutInformation loadoutInformation = new LoadoutInformation(LauncherType.DEFAULT,ProjectileType.DEFAULT);
+
+        String localAppDataFolderPathString = System.getenv("localappdata");
+        Path localAppDataPath = Path.of(localAppDataFolderPathString);
+        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        if (!Files.exists(furiousFlingersFolder)){
+            try {
+                Files.createDirectory(furiousFlingersFolder);
+            } catch (IOException creatingFuriousFlingersFolder){
+                System.out.println("Error creating Furious Flingers folder");
+                creatingFuriousFlingersFolder.printStackTrace();
+            }
+        }
+
+        Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
+        if (Files.notExists(loadoutFilePath)){
+            try {
+                Files.createFile(loadoutFilePath);
+            } catch (IOException creatingLoadoutFile){
+                System.out.println("Error creating loadout file");
+                creatingLoadoutFile.printStackTrace();
+            }
+        }
+
+        String launcher = "default";
+        String projectile = "default";
+        try (Scanner scan = new Scanner(loadoutFilePath)){
+            launcher = scan.nextLine();
+            projectile = scan.nextLine();
+        } catch (IOException readingLoadoutFile){
+            System.out.println("Error reading loadout file");
+            readingLoadoutFile.printStackTrace();
+        }
+
+        switch (launcher){
+            case "antigrav":{
+                loadoutInformation.setLauncher(LauncherType.ANTIGRAV);
+            }
+            default:{
+                loadoutInformation.setLauncher(LauncherType.DEFAULT);
+            }
+        }
+
+        switch (projectile){
+            case "bomb":{
+                loadoutInformation.setProjectile(ProjectileType.BOMB);
+            }
+            case "magnetic":{
+                loadoutInformation.setProjectile(ProjectileType.MAGNETIC);
+            }
+            case "nerd":{
+                loadoutInformation.setProjectile(ProjectileType.NERD);
+            }
+            default:{
+                loadoutInformation.setProjectile(ProjectileType.DEFAULT);
+            }
+        }
+
+        return loadoutInformation;
     }
 
     public static void main(String[] args) {

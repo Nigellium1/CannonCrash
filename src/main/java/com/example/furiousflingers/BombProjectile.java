@@ -2,12 +2,12 @@ package com.example.furiousflingers;
 
 import java.util.ArrayList;
 
-public class bombProjectile extends MovableCircle{
+public class BombProjectile extends Projectile{
 
     private final double explosionRadius = 150;
     private boolean removeThisInstance;
 
-    public bombProjectile(Vector position, Vector velocity, Vector acceleration, double radius, double orientation, double angularVelocity, Material material,String imageName) {
+    public BombProjectile(Vector position, Vector velocity, Vector acceleration, double radius, double orientation, double angularVelocity, Material material,String imageName) {
         super(position, velocity, acceleration, radius, orientation, angularVelocity, material,imageName);
         removeThisInstance = false;
     }
