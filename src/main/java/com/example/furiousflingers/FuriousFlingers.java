@@ -155,10 +155,7 @@ public class FuriousFlingers extends Application {
         addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
         addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
         addLoadoutSelection(ProjectileType.NERD, projectileGrid, 1, 1, loadoutInformation, "nerdProjectile.png");
-
-//        for (int i = 0; i < projectileGrid.getChildren().size(); i++) {
-//            if (projectileGrid.getChildren().get(i).)
-//        }
+        changeSelectedFrame(loadoutInformation.getProjectile(),projectileGrid); //Original set frame
 
         HBox gridsWindow = new HBox();
         gridsWindow.setAlignment(Pos.CENTER);
@@ -177,6 +174,7 @@ public class FuriousFlingers extends Application {
         Button button = createButton(combinedImages);
         button.setOnAction(event -> {
             loadoutInformation.setProjectile(projectile);
+            changeSelectedFrame(projectile,grid); //Change frame whenever any button is pressed
         });
         grid.add(button, i, j);
     }
@@ -289,6 +287,32 @@ public class FuriousFlingers extends Application {
 
         return loadoutInformation;
     }
+
+    public void changeSelectedFrame (ProjectileType projectile, GridPane grid){
+        //Reset all buttons
+        for (Node button:grid.getChildren()){
+            //Check to see if it has the 3rd layer in the stackpane (outline)
+            if (((StackPane)((Button)button).getGraphic()).getChildren().size()>2){
+                ((StackPane)((Button)button).getGraphic()).getChildren().remove(2);
+            }
+        }
+
+        //Add white frame on selected
+        ImageView loadoutSelectedFrame = importImage("loadoutSelectedFrame.png");
+        if (projectile == ProjectileType.DEFAULT){
+            ((StackPane)((Button)grid.getChildren().get(0)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        }
+        if (projectile == ProjectileType.MAGNETIC){
+            ((StackPane)((Button)grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        }
+        if (projectile == ProjectileType.BOMB){
+            ((StackPane)((Button)grid.getChildren().get(2)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        }
+        if (projectile == ProjectileType.NERD){
+            ((StackPane)((Button)grid.getChildren().get(3)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        }
+    }
+
 
     public static void main(String[] args) {
         launch(args);
