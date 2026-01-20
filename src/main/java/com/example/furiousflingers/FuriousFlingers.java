@@ -15,10 +15,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
@@ -146,8 +143,8 @@ public class FuriousFlingers extends Application {
 
         GridPane projectileGrid = new GridPane();
         addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, 0, 0, loadoutInformation, "defaultProjectile.png");
-        addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
-        addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
+        addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
+        addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
         addLoadoutSelection(ProjectileType.NERD, projectileGrid, 1, 1, loadoutInformation, "nerdProjectile.png");
         changeSelectedFrame(loadoutInformation.getProjectile(),projectileGrid); //Original set frame
 
@@ -268,27 +265,25 @@ public class FuriousFlingers extends Application {
         }
 
         switch (launcher){
-            case "railgun":{
+            case "railgun":
                 loadoutInformation.setLauncher(LauncherType.RAILGUN);
-            }
-            default:{
+                break;
+            default:
                 loadoutInformation.setLauncher(LauncherType.DEFAULT);
-            }
         }
 
         switch (projectile){
-            case "bomb":{
+            case "bomb":
                 loadoutInformation.setProjectile(ProjectileType.BOMB);
-            }
-            case "magnetic":{
+                break;
+            case "magnetic":
                 loadoutInformation.setProjectile(ProjectileType.MAGNETIC);
-            }
-            case "nerd":{
+                break;
+            case "nerd":
                 loadoutInformation.setProjectile(ProjectileType.NERD);
-            }
-            default:{
+                break;
+            default:
                 loadoutInformation.setProjectile(ProjectileType.DEFAULT);
-            }
         }
 
         return loadoutInformation;
@@ -327,7 +322,18 @@ public class FuriousFlingers extends Application {
     }
 
     public void writeToLoadoutInformation (LoadoutInformation loadoutInformation){
+        String localAppDataFolderPathString = System.getenv("localappdata");
+        Path localAppDataPath = Path.of(localAppDataFolderPathString);
+        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
 
+        try (FileWriter fileWriter = new FileWriter(loadoutFilePath.toFile())){
+            fileWriter.write(loadoutInformation.getLauncher().getName()+"\n");
+            fileWriter.write(loadoutInformation.getProjectile().getName());
+        }catch (IOException writingToLoadoutFile){
+            System.out.println("Error writing to loadout file");
+            writingToLoadoutFile.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

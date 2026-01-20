@@ -2,8 +2,18 @@ package com.example.furiousflingers;
 
 //So I don't pass around strings
 public enum ProjectileType implements LoadoutType{
-    DEFAULT(),
-    BOMB(),
-    MAGNETIC(),
-    NERD();
+    DEFAULT("default"),
+    BOMB("bomb"),
+    MAGNETIC("magnetic"),
+    NERD("nerd");
+
+    private final String name;
+
+    ProjectileType(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
