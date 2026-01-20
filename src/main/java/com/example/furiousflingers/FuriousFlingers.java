@@ -140,20 +140,14 @@ public class FuriousFlingers extends Application {
         });
 
         GridPane launcherGrid = new GridPane();
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
-                Button launcherButton = createButton("cannonButton.png");
-                launcherButton.setOnAction(event -> {
-
-                });
-                launcherGrid.add(launcherButton, i, j);
-            }
-        }
+        addLoadoutSelection(LauncherType.DEFAULT,launcherGrid,0,0,loadoutInformation,"defaultLauncher.png");
+        addLoadoutSelection(LauncherType.RAILGUN,launcherGrid,1,0,loadoutInformation,"railgunLauncher.png");
+        changeSelectedFrame(loadoutInformation.getLauncher(),launcherGrid);
 
         GridPane projectileGrid = new GridPane();
         addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, 0, 0, loadoutInformation, "defaultProjectile.png");
-        addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
-        addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
+        addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
+        addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
         addLoadoutSelection(ProjectileType.NERD, projectileGrid, 1, 1, loadoutInformation, "nerdProjectile.png");
         changeSelectedFrame(loadoutInformation.getProjectile(),projectileGrid); //Original set frame
 
@@ -167,14 +161,20 @@ public class FuriousFlingers extends Application {
         return loadoutPane;
     }
 
-    public void addLoadoutSelection(ProjectileType projectile, GridPane grid, int i, int j, LoadoutInformation loadoutInformation, String imagePath) {
+    public void addLoadoutSelection(LoadoutType loadoutOption, GridPane grid, int i, int j, LoadoutInformation loadoutInformation, String imagePath) {
         ImageView background = importImage("loadoutBackground.png"); //Same background for projectiles and launchers
-        ImageView loadoutChoice = importImage(imagePath);
-        StackPane combinedImages = new StackPane(background, loadoutChoice);
+        ImageView loadoutChoiceView = importImage(imagePath);
+        StackPane combinedImages = new StackPane(background, loadoutChoiceView);
         Button button = createButton(combinedImages);
         button.setOnAction(event -> {
-            loadoutInformation.setProjectile(projectile);
-            changeSelectedFrame(projectile,grid); //Change frame whenever any button is pressed
+            if (loadoutOption instanceof ProjectileType){
+                loadoutInformation.setProjectile(((ProjectileType)loadoutOption));
+            } //Else, has to be a launcher
+            else {
+                loadoutInformation.setLauncher(((LauncherType) loadoutOption));
+            }
+            writeToLoadoutInformation(loadoutInformation);
+            changeSelectedFrame(loadoutOption,grid); //Change frame whenever any button is pressed
         });
         grid.add(button, i, j);
     }
@@ -232,19 +232,25 @@ public class FuriousFlingers extends Application {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
         Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
+
         if (!Files.exists(furiousFlingersFolder)){
             try {
                 Files.createDirectory(furiousFlingersFolder);
+                Files.createFile(loadoutFilePath);
+                writeToLoadoutInformation(new LoadoutInformation(LauncherType.DEFAULT,
+                        ProjectileType.DEFAULT));
             } catch (IOException creatingFuriousFlingersFolder){
                 System.out.println("Error creating Furious Flingers folder");
                 creatingFuriousFlingersFolder.printStackTrace();
             }
         }
 
-        Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
         if (Files.notExists(loadoutFilePath)){
             try {
                 Files.createFile(loadoutFilePath);
+                writeToLoadoutInformation(new LoadoutInformation(LauncherType.DEFAULT,
+                        ProjectileType.DEFAULT));
             } catch (IOException creatingLoadoutFile){
                 System.out.println("Error creating loadout file");
                 creatingLoadoutFile.printStackTrace();
@@ -262,8 +268,8 @@ public class FuriousFlingers extends Application {
         }
 
         switch (launcher){
-            case "antigrav":{
-                loadoutInformation.setLauncher(LauncherType.ANTIGRAV);
+            case "railgun":{
+                loadoutInformation.setLauncher(LauncherType.RAILGUN);
             }
             default:{
                 loadoutInformation.setLauncher(LauncherType.DEFAULT);
@@ -288,7 +294,7 @@ public class FuriousFlingers extends Application {
         return loadoutInformation;
     }
 
-    public void changeSelectedFrame (ProjectileType projectile, GridPane grid){
+    public void changeSelectedFrame (LoadoutType loadoutOption , GridPane grid){
         //Reset all buttons
         for (Node button:grid.getChildren()){
             //Check to see if it has the 3rd layer in the stackpane (outline)
@@ -299,20 +305,30 @@ public class FuriousFlingers extends Application {
 
         //Add white frame on selected
         ImageView loadoutSelectedFrame = importImage("loadoutSelectedFrame.png");
-        if (projectile == ProjectileType.DEFAULT){
+        if (loadoutOption == LauncherType.DEFAULT){
             ((StackPane)((Button)grid.getChildren().get(0)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
-        if (projectile == ProjectileType.MAGNETIC){
+        if (loadoutOption == LauncherType.RAILGUN){
             ((StackPane)((Button)grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
-        if (projectile == ProjectileType.BOMB){
+
+        if (loadoutOption == ProjectileType.DEFAULT){
+            ((StackPane)((Button)grid.getChildren().get(0)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        }
+        if (loadoutOption == ProjectileType.BOMB){
+            ((StackPane)((Button)grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        }
+        if (loadoutOption == ProjectileType.MAGNETIC){
             ((StackPane)((Button)grid.getChildren().get(2)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
-        if (projectile == ProjectileType.NERD){
+        if (loadoutOption == ProjectileType.NERD){
             ((StackPane)((Button)grid.getChildren().get(3)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
     }
 
+    public void writeToLoadoutInformation (LoadoutInformation loadoutInformation){
+
+    }
 
     public static void main(String[] args) {
         launch(args);

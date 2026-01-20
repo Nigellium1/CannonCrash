@@ -1,9 +1,9 @@
 package com.example.furiousflingers;
 
 //So I don't pass around strings
-public enum ProjectileType {
+public enum ProjectileType implements LoadoutType{
     DEFAULT(),
-    MAGNETIC(),
     BOMB(),
+    MAGNETIC(),
     NERD();
 }

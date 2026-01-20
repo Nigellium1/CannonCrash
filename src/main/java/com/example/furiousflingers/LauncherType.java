@@ -1,6 +1,6 @@
 package com.example.furiousflingers;
 
-public enum LauncherType {
+public enum LauncherType implements LoadoutType{
     DEFAULT(),
-    ANTIGRAV();
+    RAILGUN();
 }
