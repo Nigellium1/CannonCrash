@@ -9,21 +9,27 @@ import java.io.InputStream;
 
 public class Launcher {
     private final Vector position;
-    private ImageView launcherView;
+    private ImageView launcherBaseView;
+    private ImageView launcherTurretView;
     private boolean isProjectileLive; //Is there a valid projectile being dragged right now
     private ProjectileSpawner projectileSpawner;
     private MovableCircle currentProjectile;
     double allowedRadius = 100; //Might change this
 
-    public Launcher(Vector position, Pane physicsEnginePane, ProjectileSpawner projectileSpawner) {
+    public Launcher(Vector position, Pane physicsEnginePane, ProjectileSpawner projectileSpawner,LauncherType launcher) {
         this.position = position;
-        launcherView = importImage("launcher.png");
-        launcherView.setFitWidth(100);
-        launcherView.setFitHeight(100);
+        launcherBaseView = importImage(launcher.getName()+"LauncherBase.png");
+        launcherTurretView = importImage(launcher.getName()+"LauncherTurret.png");
+
         //ImageView position is top left whereas position we are defining to be centre
-        launcherView.setX(position.getX() - launcherView.getFitWidth() / 2);
-        launcherView.setY(position.getY() - launcherView.getFitHeight() / 2);
-        physicsEnginePane.getChildren().add(launcherView);
+        launcherTurretView.setX(position.getX() - launcherTurretView.getImage().getWidth() / 2);
+        launcherTurretView.setY(position.getY() - launcherTurretView.getImage().getHeight() / 2);
+        physicsEnginePane.getChildren().add(launcherTurretView);
+
+        launcherBaseView.setX(position.getX() - launcherBaseView.getImage().getWidth() / 2);
+        launcherBaseView.setY(position.getY() - launcherBaseView.getImage().getHeight()  / 2);
+        physicsEnginePane.getChildren().add(launcherBaseView);
+
         isProjectileLive = false;
         this.projectileSpawner = projectileSpawner;
     }
@@ -31,7 +37,7 @@ public class Launcher {
     public void handleMousePress(MouseEvent event, ProjectileType projectile) {
         Vector eventPosition = new Vector(event.getX(), event.getY());
         //If click position is outside of circle (approximate circle with radius of half the largest dimension of image
-        if (eventPosition.subtract(position).magnitude() > Math.max(launcherView.getFitHeight(), launcherView.getFitWidth()) / 2) {
+        if (eventPosition.subtract(position).magnitude() > allowedRadius) {
             return;
         }
         isProjectileLive = true;
@@ -44,6 +50,8 @@ public class Launcher {
                     Material.STONE, "defaultProjectile.png");
         }
         projectileSpawner.addMovableCircle(currentProjectile);
+
+        rotateLauncherTurret(eventPosition);
     }
 
     public void handleMouseRelease (MouseEvent event){
@@ -70,6 +78,17 @@ public class Launcher {
         } else {
             currentProjectile.position = eventPosition;
         }
+
+        rotateLauncherTurret(eventPosition);
+    }
+
+    public void rotateLauncherTurret (Vector mousePosition){
+        double angle = Math.atan2(mousePosition.getY()-position.getY(),mousePosition.getX()-position.getX());
+        //Calculate angle using sohcahtoa (THIS IS CLOCKWISE BECAUSE Y IS DOWNWARDS)
+        launcherTurretView.setRotate(180+angle*(180/Math.PI));
+        //Angle already clockwise so no need to mulitiply by -1
+        //Convert radians to degrees
+        //Add 180 (half rotation) because we want cannon to point away from mouse not towards
     }
 
     public ImageView importImage(String imageName) {

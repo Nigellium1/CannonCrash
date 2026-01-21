@@ -140,10 +140,10 @@ public class PhysicsEngine implements ProjectileSpawner{
     public void addClickFunctionality (Launcher launcher){
         physicsEnginePane.setOnMousePressed(event -> {
             launcher.handleMousePress(event,projectile);
-            if (event.isPrimaryButtonDown()){
-                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
-                        120,60,0,Material.STONE);
-            }
+//            if (event.isPrimaryButtonDown()){
+//                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
+//                        120,60,0,Material.STONE);
+//            }
             if (event.isSecondaryButtonDown()){
                 addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
                         120,60,0,Material.WOOD);
@@ -180,7 +180,7 @@ public class PhysicsEngine implements ProjectileSpawner{
 
     public Launcher addLauncher (){
         ProjectileSpawner projectileSpawner = this;
-        return new Launcher(new Vector(150,350), physicsEnginePane, projectileSpawner);
+        return new Launcher(new Vector(150,300), physicsEnginePane, projectileSpawner,launcher);
     }
 
     public void removeEntity (int index) {
