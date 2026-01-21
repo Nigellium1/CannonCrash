@@ -15,7 +15,7 @@ public class PhysicsEngine implements ProjectileSpawner{
     private ArrayList<Entity> entities;
     private ArrayList<Coin> coins;
     private LauncherType launcher;
-    private ProjectileType   projectile;
+    private ProjectileType projectile;
 
     public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation){
         this.sceneWidth = sceneWidth;
@@ -60,7 +60,10 @@ public class PhysicsEngine implements ProjectileSpawner{
 
                 //Despawn entities outside of window (except above cus they fall) with 100 margin
                 for (int i = 0; i < entities.size(); i++) {
-                    if (entities.get(i).position.getX() - 100 > sceneWidth || entities.get(i).position.getX() + 100 < 0 || entities.get(i).position.getY() - 100 > sceneHeight) {
+                    if (entities.get(i).position.getX() - 100 > sceneWidth ||
+                            entities.get(i).position.getX() + 100 < 0 ||
+                            entities.get(i).position.getY() - 100 > sceneHeight ||
+                            entities.get(i).position.getY()<-500) { //Add roof but really high up only for railgun launcher)
                         removeEntity(i);
                         i--; //Removed an entity so keep on same i by decrementing
                     }
