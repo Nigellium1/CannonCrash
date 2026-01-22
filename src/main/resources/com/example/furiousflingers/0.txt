@@ -1,0 +1,7 @@
+3
+rectangle,wood,600,400,90
+rectangle,stone,750,400,90
+rectangle,wood,900,400,90
+coin,wood,600,300,0
+coin,wood,750,300,0
+coin,wood,900,300,0	

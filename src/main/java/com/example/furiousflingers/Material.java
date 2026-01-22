@@ -1,8 +1,8 @@
 package com.example.furiousflingers;
 
 public enum Material {
-    WOOD(0.1,0.4,0.2,1.6,1100,"woodRectangle.png"),
-    STONE(0.2,0.3,0.3,2.0,1200, "stoneRectangle.png"),
+    WOOD(0.1,0.4,0.2,1.6,1100,"woodRectangle"),
+    STONE(0.2,0.3,0.3,2.0,1200, "stoneRectangle"),
     IMMOVABLE(0,0.3,0.2,0.1,0,"");
 
     private final double mass;
@@ -10,15 +10,15 @@ public enum Material {
     private final double staticFriction;
     private final double dynamicFriction;
     private final double momentOfInertia;
-    private final String imageName;
+    private final String name;
 
-    Material(double mass, double restitution, double staticFriction, double dynamicFriction, double momentOfInertia, String imageName) {
+    Material(double mass, double restitution, double staticFriction, double dynamicFriction, double momentOfInertia, String name) {
         this.mass = mass;
         this.restitution = restitution;
         this.staticFriction = staticFriction;
         this.dynamicFriction = dynamicFriction;
         this.momentOfInertia = momentOfInertia;
-        this.imageName = imageName;
+        this.name = name;
     }
 
     public double getMass() {
@@ -42,6 +42,6 @@ public enum Material {
     }
 
     public String getImageName() {
-        return imageName;
+        return name+".png";
     }
 }

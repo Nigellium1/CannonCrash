@@ -106,7 +106,6 @@ public class FuriousFlingers extends Application {
                 }
 
                 Button levelButton = createButton(levelCounter + ".png");
-                levelCounter++;
                 int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
                 levelButton.setOnAction(event -> {
                     PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(),
@@ -120,6 +119,7 @@ public class FuriousFlingers extends Application {
                     }
                 });
                 buttonsWindow.add(levelButton, j, i);
+                levelCounter++;
             }
         }
 

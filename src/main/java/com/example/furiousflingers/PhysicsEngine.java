@@ -6,16 +6,18 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class PhysicsEngine implements ProjectileSpawner{
     private final double sceneWidth;
     private final double sceneHeight;
     private Pane physicsEnginePane;
     private ArrayList<Entity> entities;
-    private ArrayList<Coin> coins;
     private LauncherType launcher;
     private ProjectileType projectile;
+    private int coinsRemaining;
 
     public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation){
         this.sceneWidth = sceneWidth;
@@ -80,10 +82,22 @@ public class PhysicsEngine implements ProjectileSpawner{
 
                 //Check for entities (projectiles) that need removing
                 for (int i = 0; i < entities.size(); i++) {
+                    //Remove exploded bombs
                     if (entities.get(i) instanceof BombProjectile) {
                         if (((BombProjectile) entities.get(i)).isRemoveThisInstance()) {
                             removeEntity(i);
                             i--;
+                        }
+                    }
+                    //Remove collected coins
+                    if (entities.get(i) instanceof Coin){
+                        if (((Coin)entities.get(i)).isRemoveThisInstance()){
+                            removeEntity(i);
+                            i--;
+                            coinsRemaining--;
+                            if (coinsRemaining==0){
+                                gameEnd();
+                            }
                         }
                     }
                 }
@@ -192,7 +206,48 @@ public class PhysicsEngine implements ProjectileSpawner{
         entities.remove(index);
     }
 
+    public void addCoin (Vector position, Vector velocity, Vector acceleration, double orientation, double angularVelocity, Material material) {
+        Coin coin = new Coin(position,velocity,acceleration,27,orientation,angularVelocity, material);
+        physicsEnginePane.getChildren().add(coin.getCircleView());
+        entities.add(coin);
+    }
+
     public void addLevel (int levelNumber) {
+        String fileName = levelNumber+".txt";
+        InputStream inputStream = this.getClass().getResourceAsStream(fileName);
+        //First line will be number of coins
+        //Line structure: shape, material (includes immovable), position x, position y, orientation (IN DEGREES CUS I DONT KNOW HOW TO WRITE PI)
+        try (Scanner scan = new Scanner(inputStream)){
+            coinsRemaining = Integer.valueOf(scan.nextLine());
+            while (scan.hasNext()){
+                String instructionLine = scan.nextLine();
+                String [] instructionArray = instructionLine.split(",");
+                String shape = instructionArray[0];
+                Material material = Material.valueOf(instructionArray[1].toUpperCase());
+                double xPosition = Double.valueOf(instructionArray[2]);
+                double yPosition = Double.valueOf(instructionArray[3]);
+                double orientation = Double.valueOf(instructionArray[4])*(Math.PI/180); //Convert back to radians
+
+                if (material == Material.IMMOVABLE){
+
+                } else if (shape.equals("coin")) {
+                    addCoin(new Vector(xPosition,yPosition),new Vector(0,0),new Vector(0,1000),orientation,0, material);
+                } else { //Else movable
+                    if (shape.equals("circle")){
+
+                    } else { //Else rectangle
+                        addMovableRectangle(new Vector(xPosition,yPosition),new Vector(0,0),new Vector(0,1000),
+                            120,60,orientation, material);
+                    }
+                }
+            }
+        } catch (Exception readingLevel){
+            System.out.println("Error reading level");
+            readingLevel.printStackTrace();
+        }
+    }
+
+    public void gameEnd () {
 
     }
 }
