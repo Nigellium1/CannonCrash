@@ -1,6 +1,7 @@
 package com.example.furiousflingers;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -141,14 +142,56 @@ public class FuriousFlingers extends Application {
             BorderPane levelsPane = setupLevelsPane(basePane, loadoutInformation);
             basePane.getChildren().set(1, levelsPane);
         });
-
-
-
         gamePane.getChildren().add(backButton);
         gamePane.setAlignment(backButton,Pos.TOP_LEFT);
 
+        HBox levelinformation = createLevelInformation(levelInformationCounter, loadoutInformation);
+        gamePane.getChildren().add(levelinformation);
+        gamePane.setAlignment(levelinformation,Pos.TOP_RIGHT);
+
         return gamePane;
     }
+
+    public HBox createLevelInformation (LevelInformationCounter levelInformationCounter,LoadoutInformation loadoutInformation) {
+        HBox levelInformation = new HBox();
+        levelInformation.setMouseTransparent(true); //Stop it blocking mouse clicks of below layers
+        levelInformation.setAlignment(Pos.CENTER); //Make children go in middle
+        levelInformation.setPadding(new Insets(10)); //Add padding on inside so its not right against the window
+        levelInformation.setMaxSize(Region.USE_PREF_SIZE,Region.USE_PREF_SIZE); //Makes it not take up the whole screen
+        levelInformation.setSpacing(5); //Add spacing between each child
+
+        ImageView projectileView = importImage(loadoutInformation.getProjectile().getName()+"Projectile.png");
+        double projectileOriginalDimension = projectileView.getImage().getHeight();
+        projectileView.setFitHeight(projectileOriginalDimension/2);
+        projectileView.setFitWidth(projectileOriginalDimension/2);
+
+        levelInformation.getChildren().add(projectileView);
+        levelInformation.getChildren().add(importImage("X.png"));
+        levelInformation.getChildren().add(makeNumberIntoSingleNode(levelInformationCounter.getProjectilesRemaining()));
+
+        ImageView coinView = importImage("coin.png");
+        double coinOriginalDimension = coinView.getImage().getHeight();
+        coinView.setFitHeight(coinOriginalDimension/2);
+        coinView.setFitWidth(coinOriginalDimension/2);
+
+        levelInformation.getChildren().add(coinView);
+        levelInformation.getChildren().add(importImage("X.png"));
+        levelInformation.getChildren().add(makeNumberIntoSingleNode(levelInformationCounter.getCoinsCollected()));
+
+        return levelInformation;
+    }
+
+    public HBox makeNumberIntoSingleNode (int number){
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        String numberString = String.valueOf(number);
+        for (int i = 0; i < numberString.length(); i++) {
+            hBox.getChildren().add(importImage(numberString.charAt(i)+".png"));
+        }
+        return hBox;
+    }
+
+
 
     public BorderPane setupLoadoutPane(StackPane basePane, LoadoutInformation loadoutInformation) {
         Button backButton = createButton("backButton.png");
