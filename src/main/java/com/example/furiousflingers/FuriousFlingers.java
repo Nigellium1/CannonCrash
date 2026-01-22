@@ -8,10 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -110,7 +107,10 @@ public class FuriousFlingers extends Application {
                 levelButton.setOnAction(event -> {
                     PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(),
                             levelButton.getScene().getHeight(), loadoutInformation);
-                    basePane.getChildren().set(1, physicsEngine.getPhysicsEnginePane());
+
+                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation);
+
+                    basePane.getChildren().set(1, gamePane);
                     try {
                         physicsEngine.start(levelNumber);
                     } catch (Exception startingPhysicsEngine) {
@@ -127,6 +127,22 @@ public class FuriousFlingers extends Application {
         levelsPane.setTop(backButton);
         levelsPane.setCenter(buttonsWindow);
         return levelsPane;
+    }
+
+    public StackPane setupGamePane (PhysicsEngine physicsEngine, StackPane basePane, LoadoutInformation loadoutInformation){
+        StackPane gamePane = new StackPane();
+        Pane physicsEnginePane = physicsEngine.getPhysicsEnginePane();
+        gamePane.getChildren().add(physicsEnginePane);
+
+        Button backButton = createButton("backButton.png");
+        backButton.setOnAction(event -> {
+            BorderPane levelsPane = setupLevelsPane(basePane, loadoutInformation);
+            basePane.getChildren().set(1, levelsPane);
+        });
+        gamePane.getChildren().add(backButton);
+        gamePane.setAlignment(backButton,Pos.TOP_LEFT);
+
+        return gamePane;
     }
 
     public BorderPane setupLoadoutPane(StackPane basePane, LoadoutInformation loadoutInformation) {
