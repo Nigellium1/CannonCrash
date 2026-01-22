@@ -34,13 +34,14 @@ public class Launcher {
         this.projectileSpawner = projectileSpawner;
     }
 
-    public void handleMousePress(MouseEvent event, ProjectileType projectile) {
+    public void handleMousePress(MouseEvent event, ProjectileType projectile,LevelInformationCounter levelInformationCounter) {
         Vector eventPosition = new Vector(event.getX(), event.getY());
         //If click position is outside of circle (approximate circle with radius of half the largest dimension of image
         if (eventPosition.subtract(position).magnitude() > allowedRadius) {
             return;
         }
         isProjectileLive = true;
+        levelInformationCounter.minusProjectilesRemaining();
         if (projectile == ProjectileType.BOMB){
             //Actual image radius is 28 but it looks better if hitbox is slightly smaller than image (no gaps)
             currentProjectile = new BombProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,

@@ -1,4 +1,5 @@
 3
+5
 rectangle,wood,600,400,90
 rectangle,stone,750,400,90
 rectangle,wood,900,400,90

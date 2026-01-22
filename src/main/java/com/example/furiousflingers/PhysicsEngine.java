@@ -3,8 +3,10 @@
 package com.example.furiousflingers;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.PauseTransition;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,15 +19,17 @@ public class PhysicsEngine implements ProjectileSpawner{
     private ArrayList<Entity> entities;
     private LauncherType launcher;
     private ProjectileType projectile;
-    private int coinsRemaining;
+    private LevelInformationCounter levelInformationCounter;
 
-    public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation){
+    public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation,
+                          LevelInformationCounter levelInformationCounter){
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
         entities = new ArrayList<>();
         launcher = loadoutInformation.getLauncher();
         projectile = loadoutInformation.getProjectile();
         physicsEnginePane = new Pane();
+        this.levelInformationCounter = levelInformationCounter;
         setupPane();
     }
 
@@ -66,6 +70,13 @@ public class PhysicsEngine implements ProjectileSpawner{
                             entities.get(i).position.getX() + 100 < 0 ||
                             entities.get(i).position.getY() - 100 > sceneHeight ||
                             entities.get(i).position.getY()<-500) { //Add roof but really high up only for railgun launcher)
+                        if (entities.get(i) instanceof Coin){
+                            levelInformationCounter.addCoinCollected();
+                            if (levelInformationCounter.getCoinsCollected() == levelInformationCounter.getCoinsInLevel()){
+                                gameEnd();
+                            }
+                        }
+
                         removeEntity(i);
                         i--; //Removed an entity so keep on same i by decrementing
                     }
@@ -94,8 +105,8 @@ public class PhysicsEngine implements ProjectileSpawner{
                         if (((Coin)entities.get(i)).isRemoveThisInstance()){
                             removeEntity(i);
                             i--;
-                            coinsRemaining--;
-                            if (coinsRemaining==0){
+                            levelInformationCounter.addCoinCollected();
+                            if (levelInformationCounter.getCoinsCollected() == levelInformationCounter.getCoinsInLevel()){
                                 gameEnd();
                             }
                         }
@@ -156,7 +167,18 @@ public class PhysicsEngine implements ProjectileSpawner{
 
     public void addClickFunctionality (Launcher launcher){
         physicsEnginePane.setOnMousePressed(event -> {
-            launcher.handleMousePress(event,projectile);
+            if (levelInformationCounter.getProjectilesRemaining()==0){
+                return; //If all projectiles used, don't let anymore
+            }
+            launcher.handleMousePress(event,projectile,levelInformationCounter);
+            if (levelInformationCounter.getProjectilesRemaining()==0){
+                //5 second delay then end
+                PauseTransition delay = new PauseTransition(Duration.seconds(5));
+                delay.setOnFinished(endGame -> {
+                     gameEnd();
+                });
+                delay.play();
+            }
 //            if (event.isPrimaryButtonDown()){
 //                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
 //                        120,60,0,Material.STONE);
@@ -216,9 +238,11 @@ public class PhysicsEngine implements ProjectileSpawner{
         String fileName = levelNumber+".txt";
         InputStream inputStream = this.getClass().getResourceAsStream(fileName);
         //First line will be number of coins
+        //Second line will be number of projectiles
         //Line structure: shape, material (includes immovable), position x, position y, orientation (IN DEGREES CUS I DONT KNOW HOW TO WRITE PI)
         try (Scanner scan = new Scanner(inputStream)){
-            coinsRemaining = Integer.valueOf(scan.nextLine());
+            levelInformationCounter.setCoinsInLevel(Integer.valueOf(scan.nextLine()));
+            levelInformationCounter.setProjectilesRemaining(Integer.valueOf(scan.nextLine()));
             while (scan.hasNext()){
                 String instructionLine = scan.nextLine();
                 String [] instructionArray = instructionLine.split(",");
@@ -248,7 +272,7 @@ public class PhysicsEngine implements ProjectileSpawner{
     }
 
     public void gameEnd () {
-
+        System.out.println("TEMP GAME END");
     }
 }
 

@@ -105,10 +105,11 @@ public class FuriousFlingers extends Application {
                 Button levelButton = createButton(levelCounter + ".png");
                 int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
                 levelButton.setOnAction(event -> {
+                    LevelInformationCounter levelInformationCounter = new LevelInformationCounter();
                     PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(),
-                            levelButton.getScene().getHeight(), loadoutInformation);
+                            levelButton.getScene().getHeight(), loadoutInformation,levelInformationCounter);
 
-                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation);
+                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation,levelInformationCounter);
 
                     basePane.getChildren().set(1, gamePane);
                     try {
@@ -129,7 +130,8 @@ public class FuriousFlingers extends Application {
         return levelsPane;
     }
 
-    public StackPane setupGamePane (PhysicsEngine physicsEngine, StackPane basePane, LoadoutInformation loadoutInformation){
+    public StackPane setupGamePane (PhysicsEngine physicsEngine, StackPane basePane, LoadoutInformation loadoutInformation
+    , LevelInformationCounter levelInformationCounter){
         StackPane gamePane = new StackPane();
         Pane physicsEnginePane = physicsEngine.getPhysicsEnginePane();
         gamePane.getChildren().add(physicsEnginePane);
@@ -139,6 +141,9 @@ public class FuriousFlingers extends Application {
             BorderPane levelsPane = setupLevelsPane(basePane, loadoutInformation);
             basePane.getChildren().set(1, levelsPane);
         });
+
+
+
         gamePane.getChildren().add(backButton);
         gamePane.setAlignment(backButton,Pos.TOP_LEFT);
 
