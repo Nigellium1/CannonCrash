@@ -92,7 +92,7 @@ public class FuriousFlingers extends Application {
                 if (levelCounter > levelsUnlocked) {
                     //Stack lock image over level image
                     ImageView lock = importImage("lock.png");
-                    ImageView level = importImage(levelCounter + ".png");
+                    ImageView level = importImage("Level" + levelCounter + ".png");
                     level.setOpacity(0.70); //Fade the level
                     StackPane.setAlignment(lock, Pos.TOP_RIGHT); //Put lock in top right
                     //Small margin
@@ -102,7 +102,7 @@ public class FuriousFlingers extends Application {
                     continue;
                 }
 
-                Button levelButton = createButton(levelCounter + ".png");
+                Button levelButton = createButton("Level" + levelCounter + ".png");
                 int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
                 levelButton.setOnAction(event -> {
                     LevelInformationCounter levelInformationCounter = new LevelInformationCounter();
