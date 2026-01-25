@@ -14,7 +14,7 @@ public abstract class Movable extends Entity {
         this.velocity = velocity;
         this.angularVelocity = angularVelocity; //in rad/s, usually pretty big because impulse is usually large (lots of pixels), but around 6 rad is a full rotation so large MOI needed to cancel out
         this.acceleration = acceleration;
-        numberOfDormantCycles = 0;
+        numberOfDormantCycles = 10;
     }
 
     public void standardUpdate(double time) {

@@ -18,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 
-public class FuriousFlingers extends Application {
+public class FuriousFlingers extends Application implements LevelInformationUpdater {
 
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Furious Flingers");
@@ -106,11 +106,11 @@ public class FuriousFlingers extends Application {
                 Button levelButton = createButton("Level" + levelCounter + ".png");
                 int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
                 levelButton.setOnAction(event -> {
-                    LevelInformationCounter levelInformationCounter = new LevelInformationCounter();
+                    LevelInformation levelInformation = new LevelInformation();
                     PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(),
-                            levelButton.getScene().getHeight(), loadoutInformation,levelInformationCounter);
+                            levelButton.getScene().getHeight(), loadoutInformation,levelInformation);
 
-                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation,levelInformationCounter);
+                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation,levelInformation);
 
                     basePane.getChildren().set(1, gamePane);
                     try {
@@ -132,7 +132,7 @@ public class FuriousFlingers extends Application {
     }
 
     public StackPane setupGamePane (PhysicsEngine physicsEngine, StackPane basePane, LoadoutInformation loadoutInformation
-    , LevelInformationCounter levelInformationCounter){
+    , LevelInformation levelInformation){
         StackPane gamePane = new StackPane();
         Pane physicsEnginePane = physicsEngine.getPhysicsEnginePane();
         gamePane.getChildren().add(physicsEnginePane);
@@ -145,40 +145,45 @@ public class FuriousFlingers extends Application {
         gamePane.getChildren().add(backButton);
         gamePane.setAlignment(backButton,Pos.TOP_LEFT);
 
-        HBox levelinformation = createLevelInformation(levelInformationCounter, loadoutInformation);
-        gamePane.getChildren().add(levelinformation);
-        gamePane.setAlignment(levelinformation,Pos.TOP_RIGHT);
+        HBox levelInformationDisplay = createLevelInformation(levelInformation, loadoutInformation);
+        gamePane.getChildren().add(levelInformationDisplay);
+        gamePane.setAlignment(levelInformationDisplay,Pos.TOP_RIGHT);
+
+        physicsEngine.setLevelInformationUpdater(this::updateLevelInformationDisplay);
+        physicsEngine.setLevelInformationDisplay(levelInformationDisplay);
 
         return gamePane;
     }
 
-    public HBox createLevelInformation (LevelInformationCounter levelInformationCounter,LoadoutInformation loadoutInformation) {
-        HBox levelInformation = new HBox();
-        levelInformation.setMouseTransparent(true); //Stop it blocking mouse clicks of below layers
-        levelInformation.setAlignment(Pos.CENTER); //Make children go in middle
-        levelInformation.setPadding(new Insets(10)); //Add padding on inside so its not right against the window
-        levelInformation.setMaxSize(Region.USE_PREF_SIZE,Region.USE_PREF_SIZE); //Makes it not take up the whole screen
-        levelInformation.setSpacing(5); //Add spacing between each child
+    public HBox createLevelInformation (LevelInformation levelInformation,LoadoutInformation loadoutInformation) {
+        HBox levelInformationDisplay = new HBox();
+        levelInformationDisplay.setMouseTransparent(true); //Stop it blocking mouse clicks of below layers
+        levelInformationDisplay.setAlignment(Pos.CENTER); //Make children go in middle
+        levelInformationDisplay.setPadding(new Insets(10)); //Add padding on inside so its not right against the window
+        levelInformationDisplay.setMaxSize(Region.USE_PREF_SIZE,Region.USE_PREF_SIZE); //Makes it not take up the whole screen
+        levelInformationDisplay.setSpacing(5); //Add spacing between each child
 
         ImageView projectileView = importImage(loadoutInformation.getProjectile().getName()+"Projectile.png");
         double projectileOriginalDimension = projectileView.getImage().getHeight();
         projectileView.setFitHeight(projectileOriginalDimension/2);
         projectileView.setFitWidth(projectileOriginalDimension/2);
 
-        levelInformation.getChildren().add(projectileView);
-        levelInformation.getChildren().add(importImage("X.png"));
-        levelInformation.getChildren().add(makeNumberIntoSingleNode(levelInformationCounter.getProjectilesRemaining()));
+        levelInformationDisplay.getChildren().add(projectileView);
+        levelInformationDisplay.getChildren().add(importImage("X.png"));
+        levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp values
 
         ImageView coinView = importImage("coin.png");
         double coinOriginalDimension = coinView.getImage().getHeight();
         coinView.setFitHeight(coinOriginalDimension/2);
         coinView.setFitWidth(coinOriginalDimension/2);
 
-        levelInformation.getChildren().add(coinView);
-        levelInformation.getChildren().add(importImage("X.png"));
-        levelInformation.getChildren().add(makeNumberIntoSingleNode(levelInformationCounter.getCoinsCollected()));
+        levelInformationDisplay.getChildren().add(coinView);
+        levelInformationDisplay.getChildren().add(importImage("X.png"));
+        levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp values
+        levelInformationDisplay.getChildren().add(importImage("slash.png"));
+        levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp value
 
-        return levelInformation;
+        return levelInformationDisplay;
     }
 
     public HBox makeNumberIntoSingleNode (int number){
@@ -191,7 +196,11 @@ public class FuriousFlingers extends Application {
         return hBox;
     }
 
-
+    public void updateLevelInformationDisplay(LevelInformation levelInformation, HBox hBox){
+        hBox.getChildren().set(2,makeNumberIntoSingleNode(levelInformation.getProjectilesRemaining()));
+        hBox.getChildren().set(5,makeNumberIntoSingleNode(levelInformation .getCoinsCollected()));
+        hBox.getChildren().set(7,makeNumberIntoSingleNode(levelInformation.getCoinsInLevel()));
+    }
 
     public BorderPane setupLoadoutPane(StackPane basePane, LoadoutInformation loadoutInformation) {
         Button backButton = createButton("backButton.png");

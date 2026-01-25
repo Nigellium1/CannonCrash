@@ -3,6 +3,7 @@ package com.example.furiousflingers;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 import java.io.InputStream;
@@ -34,21 +35,23 @@ public class Launcher {
         this.projectileSpawner = projectileSpawner;
     }
 
-    public void handleMousePress(MouseEvent event, ProjectileType projectile,LevelInformationCounter levelInformationCounter) {
+    public void handleMousePress(MouseEvent event, ProjectileType projectile, LevelInformation levelInformation,
+                                 HBox levelInformationDisplay, LevelInformationUpdater levelInformationUpdater) {
         Vector eventPosition = new Vector(event.getX(), event.getY());
         //If click position is outside of circle (approximate circle with radius of half the largest dimension of image
         if (eventPosition.subtract(position).magnitude() > allowedRadius) {
             return;
         }
         isProjectileLive = true;
-        levelInformationCounter.minusProjectilesRemaining();
+        levelInformation.minusProjectilesRemaining();
+        levelInformationUpdater.updateLevelInformationDisplay(levelInformation,levelInformationDisplay);
         if (projectile == ProjectileType.BOMB){
             //Actual image radius is 28 but it looks better if hitbox is slightly smaller than image (no gaps)
             currentProjectile = new BombProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
-                    Material.STONE,"bombProjectile.png");
+                    Material.WOOD,"bombProjectile.png");
         } else {
             currentProjectile = new Projectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
-                    Material.STONE, "defaultProjectile.png");
+                    Material.WOOD, "defaultProjectile.png");
         }
         projectileSpawner.addMovableCircle(currentProjectile);
 

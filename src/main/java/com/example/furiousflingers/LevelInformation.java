@@ -1,6 +1,6 @@
 package com.example.furiousflingers;
 
-public class LevelInformationCounter {
+public class LevelInformation {
     private int projectilesRemaining;
     private int coinsCollected;
     private int coinsInLevel;

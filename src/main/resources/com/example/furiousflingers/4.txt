@@ -1,0 +1,12 @@
+1
+4
+coin,wood,650,410,0
+rectangle,stone,590,390,90
+rectangle,stone,710,390,90
+rectangle,wood,650,300,0
+circle,wood,530,410,0
+circle,wood,470,410,0
+circle,wood,500,370,0
+circle,wood,770,410,0
+circle,wood,830,410,0
+circle,wood,800,370,0
