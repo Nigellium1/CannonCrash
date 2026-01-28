@@ -22,6 +22,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     private final double gameWidth = 1000;
     private final double gameHeight = 500;
 
+
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Furious Flingers");
         primaryStage.show();
@@ -79,7 +80,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     }
 
     public BorderPane setupLevelsPane(StackPane basePane, LoadoutInformation loadoutInformation) {
-        int levelsUnlocked = 5; //THIS SHOULD BE PASSED TO THE ROUTINE
+        int levelsUnlocked = importLevelsCompleted(); //THIS SHOULD BE PASSED TO THE ROUTINE
 
         Button backButton = createButton("backButton.png");
         backButton.setOnAction(event -> {
@@ -87,45 +88,48 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
             basePane.getChildren().set(1, menuPane);
         });
 
-        GridPane buttonsWindow = new GridPane();
+        TilePane buttonsWindow = new TilePane();
+        buttonsWindow.setHgap(10);
+        buttonsWindow.setVgap(10);
         buttonsWindow.setAlignment(Pos.CENTER);
+        buttonsWindow.setPrefColumns(5);
+        buttonsWindow.setMaxSize(Region.USE_PREF_SIZE,Region.USE_PREF_SIZE);
+
         int levelCounter = 0;
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (levelCounter > levelsUnlocked) {
-                    //Stack lock image over level image
-                    ImageView lock = importImage("lock.png");
-                    ImageView level = importImage("Level" + levelCounter + ".png");
-                    level.setOpacity(0.70); //Fade the level
-                    StackPane.setAlignment(lock, Pos.TOP_RIGHT); //Put lock in top right
-                    //Small margin
-                    StackPane combinedImages = new StackPane(level, lock);
-                    buttonsWindow.add(combinedImages, j, i);
-                    levelCounter++;
-                    continue;
-                }
-
-                Button levelButton = createButton("Level" + levelCounter + ".png");
-                int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
-                levelButton.setOnAction(event -> {
-                    LevelInformation levelInformation = new LevelInformation();
-                    levelInformation.setLevelNumber(levelNumber);
-                    PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth,
-                            gameHeight, loadoutInformation, levelInformation);
-
-                    StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation, levelInformation);
-
-                    basePane.getChildren().set(1, gamePane);
-                    try {
-                        physicsEngine.start();
-                    } catch (Exception startingPhysicsEngine) {
-                        System.out.println("Error starting physics engine");
-                        startingPhysicsEngine.printStackTrace();
-                    }
-                });
-                buttonsWindow.add(levelButton, j, i);
+        for (int i = 0; i < 10; i++) {
+            if (levelCounter > levelsUnlocked) {
+                //Stack lock image over level image
+                ImageView lock = importImage("lock.png");
+                ImageView level = importImage("Level" + levelCounter + ".png");
+                level.setOpacity(0.70); //Fade the level
+                StackPane.setAlignment(lock, Pos.TOP_RIGHT); //Put lock in top right
+                //Small margin
+                StackPane combinedImages = new StackPane(level, lock);
+                buttonsWindow.getChildren().add(combinedImages);
                 levelCounter++;
+                continue;
             }
+
+            Button levelButton = createButton("Level" + levelCounter + ".png");
+            int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
+            levelButton.setOnAction(event -> {
+                LevelInformation levelInformation = new LevelInformation();
+                levelInformation.setLevelNumber(levelNumber);
+                PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth,
+                        gameHeight, loadoutInformation, levelInformation);
+
+                StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation, levelInformation);
+
+                basePane.getChildren().set(1, gamePane);
+                try {
+                    physicsEngine.start();
+                } catch (Exception startingPhysicsEngine) {
+                    System.out.println("Error starting physics engine");
+                    startingPhysicsEngine.printStackTrace();
+                }
+            });
+            buttonsWindow.getChildren().add(levelButton);
+            levelCounter++;
         }
 
         BorderPane levelsPane = new BorderPane();
@@ -148,11 +152,11 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         gamePane.getChildren().add(backButton);
         gamePane.setAlignment(backButton, Pos.TOP_LEFT);
 
-        HBox levelInformationDisplay = createLevelInformation(levelInformation, loadoutInformation);
+        HBox levelInformationDisplay = createLevelInformation(loadoutInformation);
         gamePane.getChildren().add(levelInformationDisplay);
         gamePane.setAlignment(levelInformationDisplay, Pos.TOP_RIGHT);
 
-        StackPane levelEndPane = setupLevelEndPane(basePane,loadoutInformation,levelInformation.getLevelNumber());
+        StackPane levelEndPane = setupLevelEndPane(basePane, loadoutInformation, levelInformation.getLevelNumber());
         gamePane.getChildren().add(levelEndPane);
         gamePane.setAlignment(levelEndPane, Pos.CENTER);
 
@@ -163,7 +167,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return gamePane;
     }
 
-    public StackPane setupLevelEndPane(StackPane basePane, LoadoutInformation loadoutInformation,int levelNumber) {
+    public StackPane setupLevelEndPane(StackPane basePane, LoadoutInformation loadoutInformation, int levelNumber) {
         StackPane levelEndPane = new StackPane();
         levelEndPane.setMouseTransparent(true);
         levelEndPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
@@ -174,9 +178,10 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         victoryPane.getChildren().add(importImage("victoryEndScreen.png"));
 
         HBox victoryButtonRow = new HBox();
+        victoryButtonRow.setPadding(new Insets(50)); //So not stuck to bottom
         Button victoryBackButton = createButton("backButton.png");
         victoryBackButton.setOnAction(event -> {
-            BorderPane levelsPane = setupLevelsPane(basePane,loadoutInformation);
+            BorderPane levelsPane = setupLevelsPane(basePane, loadoutInformation);
             basePane.getChildren().set(1, levelsPane);
         });
         victoryButtonRow.getChildren().add(victoryBackButton);
@@ -203,8 +208,8 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         Button nextLevelButton = createButton("nextLevelButton.png");
         nextLevelButton.setOnAction(event -> {
             LevelInformation nextLevelInformation = new LevelInformation();
-            nextLevelInformation.setLevelNumber(levelNumber+1);
-            PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth,gameHeight,loadoutInformation,nextLevelInformation);
+            nextLevelInformation.setLevelNumber(levelNumber + 1);
+            PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth, gameHeight, loadoutInformation, nextLevelInformation);
             StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation,
                     nextLevelInformation);
             basePane.getChildren().set(1, gamePane);
@@ -214,7 +219,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
                 System.out.println("Error starting physics engine");
                 startingPhysicsEngine.printStackTrace();
             }
-        } );
+        });
         victoryButtonRow.getChildren().add(nextLevelButton);
 
         victoryPane.getChildren().add(victoryButtonRow);
@@ -226,9 +231,10 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         defeatPane.getChildren().add(importImage("defeatEndScreen.png"));
 
         HBox defeatButtonRow = new HBox();
+        defeatButtonRow.setPadding(new Insets(50)); //So not stuck to bottom
         Button defeatBackButton = createButton("backButton.png");
         defeatBackButton.setOnAction(event -> {
-            BorderPane levelsPane = setupLevelsPane(basePane,loadoutInformation);
+            BorderPane levelsPane = setupLevelsPane(basePane, loadoutInformation);
             basePane.getChildren().set(1, levelsPane);
         });
         defeatButtonRow.getChildren().add(defeatBackButton);
@@ -259,7 +265,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return levelEndPane;
     }
 
-    public HBox createLevelInformation(LevelInformation levelInformation, LoadoutInformation loadoutInformation) {
+    public HBox createLevelInformation(LoadoutInformation loadoutInformation) {
         HBox levelInformationDisplay = new HBox();
         levelInformationDisplay.setMouseTransparent(true); //Stop it blocking mouse clicks of below layers
         levelInformationDisplay.setAlignment(Pos.CENTER); //Make children go in middle
@@ -510,6 +516,58 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         } catch (IOException writingToLoadoutFile) {
             System.out.println("Error writing to loadout file");
             writingToLoadoutFile.printStackTrace();
+        }
+    }
+
+    public int importLevelsCompleted() {
+        String localAppDataFolderPathString = System.getenv("localappdata");
+        Path localAppDataPath = Path.of(localAppDataFolderPathString);
+        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
+
+        if (!Files.exists(furiousFlingersFolder)) {
+            try {
+                Files.createDirectory(furiousFlingersFolder);
+                Files.createFile(levelsCompletedFilePath);
+                writeToLevelsCompleted(0);
+            } catch (IOException creatingFuriousFlingersFolder) {
+                System.out.println("Error creating Furious Flingers folder");
+                creatingFuriousFlingersFolder.printStackTrace();
+            }
+        }
+
+        if (Files.notExists(levelsCompletedFilePath)) {
+            try {
+                Files.createFile(levelsCompletedFilePath);
+                writeToLevelsCompleted(0);
+            } catch (IOException creatingLevelsCompletedFile) {
+                System.out.println("Error creating levels completed file");
+                creatingLevelsCompletedFile.printStackTrace();
+            }
+        }
+
+        int levelsComplete = 0;
+        try (Scanner scan = new Scanner(levelsCompletedFilePath)) {
+            levelsComplete = Integer.parseInt(scan.nextLine());
+        } catch (IOException readingLevelsCompletedFile) {
+            System.out.println("Error reading levels completed file");
+            readingLevelsCompletedFile.printStackTrace();
+        }
+
+        return levelsComplete;
+    }
+
+    public void writeToLevelsCompleted(int levelsCompleted) {
+        String localAppDataFolderPathString = System.getenv("localappdata");
+        Path localAppDataPath = Path.of(localAppDataFolderPathString);
+        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
+
+        try (FileWriter fileWriter = new FileWriter(levelsCompletedFilePath.toFile())) {
+            fileWriter.write(String.valueOf(levelsCompleted));
+        } catch (IOException writingToLevelsCompletedFile) {
+            System.out.println("Error writing to levels completed file");
+            writingToLevelsCompletedFile.printStackTrace();
         }
     }
 

@@ -10,7 +10,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -296,6 +299,7 @@ public class PhysicsEngine implements ProjectileSpawner{
         if (isWin){
             endScreen.getChildren().get(0).setVisible(true);
             endScreen.getChildren().get(0).setMouseTransparent(false);
+            writeToLevelsCompleted(levelInformation.getLevelNumber()+1);
         } else {
             endScreen.getChildren().get(1).setVisible(true);
             endScreen.getChildren().get(1).setMouseTransparent(false);
@@ -312,6 +316,20 @@ public class PhysicsEngine implements ProjectileSpawner{
 
     public void setEndScreen(StackPane endScreen) {
         this.endScreen = endScreen;
+    }
+
+    public void writeToLevelsCompleted (int levelsCompleted) {
+        String localAppDataFolderPathString = System.getenv("localappdata");
+        Path localAppDataPath = Path.of(localAppDataFolderPathString);
+        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
+
+        try (FileWriter fileWriter = new FileWriter(levelsCompletedFilePath.toFile())) {
+            fileWriter.write(String.valueOf(levelsCompleted));
+        } catch (IOException writingToLevelsCompletedFile) {
+            System.out.println("Error writing to levels completed file");
+            writingToLevelsCompletedFile.printStackTrace();
+        }
     }
 }
 
