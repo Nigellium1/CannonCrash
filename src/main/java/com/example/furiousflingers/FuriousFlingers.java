@@ -19,11 +19,13 @@ import java.nio.file.Path;
 import java.util.Scanner;
 
 public class FuriousFlingers extends Application implements LevelInformationUpdater {
+    private final double gameWidth = 1000;
+    private final double gameHeight = 500;
 
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Furious Flingers");
         primaryStage.show();
-        Scene startScene = new Scene(setupBasePane(), 1000, 500);
+        Scene startScene = new Scene(setupBasePane(), gameWidth, gameHeight);
         primaryStage.setScene(startScene);
     }
 
@@ -107,14 +109,15 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
                 int levelNumber = levelCounter; //Lambda expression doesn't let me use levelCounter below for some reason?
                 levelButton.setOnAction(event -> {
                     LevelInformation levelInformation = new LevelInformation();
-                    PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(),
-                            levelButton.getScene().getHeight(), loadoutInformation,levelInformation);
+                    levelInformation.setLevelNumber(levelNumber);
+                    PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth,
+                            gameHeight, loadoutInformation, levelInformation);
 
-                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation,levelInformation,levelNumber);
+                    StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation, levelInformation);
 
                     basePane.getChildren().set(1, gamePane);
                     try {
-                        physicsEngine.start(levelNumber);
+                        physicsEngine.start();
                     } catch (Exception startingPhysicsEngine) {
                         System.out.println("Error starting physics engine");
                         startingPhysicsEngine.printStackTrace();
@@ -131,8 +134,8 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return levelsPane;
     }
 
-    public StackPane setupGamePane (PhysicsEngine physicsEngine, StackPane basePane, LoadoutInformation loadoutInformation
-    , LevelInformation levelInformation, int levelNumber){
+    public StackPane setupGamePane(PhysicsEngine physicsEngine, StackPane basePane, LoadoutInformation loadoutInformation
+            , LevelInformation levelInformation) {
         StackPane gamePane = new StackPane();
         Pane physicsEnginePane = physicsEngine.getPhysicsEnginePane();
         gamePane.getChildren().add(physicsEnginePane);
@@ -143,15 +146,15 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
             basePane.getChildren().set(1, levelsPane);
         });
         gamePane.getChildren().add(backButton);
-        gamePane.setAlignment(backButton,Pos.TOP_LEFT);
+        gamePane.setAlignment(backButton, Pos.TOP_LEFT);
 
         HBox levelInformationDisplay = createLevelInformation(levelInformation, loadoutInformation);
         gamePane.getChildren().add(levelInformationDisplay);
-        gamePane.setAlignment(levelInformationDisplay,Pos.TOP_RIGHT);
+        gamePane.setAlignment(levelInformationDisplay, Pos.TOP_RIGHT);
 
-        StackPane levelEndPane = setupLevelEndPane();
+        StackPane levelEndPane = setupLevelEndPane(basePane,loadoutInformation,levelInformation.getLevelNumber());
         gamePane.getChildren().add(levelEndPane);
-        gamePane.setAlignment(levelEndPane,Pos.CENTER);
+        gamePane.setAlignment(levelEndPane, Pos.CENTER);
 
         physicsEngine.setLevelInformationUpdater(this::updateLevelInformationDisplay);
         physicsEngine.setLevelInformationDisplay(levelInformationDisplay);
@@ -160,41 +163,114 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return gamePane;
     }
 
-    public StackPane setupLevelEndPane (){
+    public StackPane setupLevelEndPane(StackPane basePane, LoadoutInformation loadoutInformation,int levelNumber) {
         StackPane levelEndPane = new StackPane();
         levelEndPane.setMouseTransparent(true);
+        levelEndPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         StackPane victoryPane = new StackPane();
         victoryPane.setMouseTransparent(true);
         victoryPane.setVisible(false);
         victoryPane.getChildren().add(importImage("victoryEndScreen.png"));
-        HBox victoryButtonRow = new HBox();
-        victoryButtonRow.getChildren().add(createButton("backButton.png"));
 
+        HBox victoryButtonRow = new HBox();
+        Button victoryBackButton = createButton("backButton.png");
+        victoryBackButton.setOnAction(event -> {
+            BorderPane levelsPane = setupLevelsPane(basePane,loadoutInformation);
+            basePane.getChildren().set(1, levelsPane);
+        });
+        victoryButtonRow.getChildren().add(victoryBackButton);
+
+        Button victoryReplayButton = createButton("replayButton.png");
+        victoryReplayButton.setOnAction(event -> {
+            LevelInformation levelInformation = new LevelInformation();
+            levelInformation.setLevelNumber(levelNumber);
+            PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth,
+                    gameHeight, loadoutInformation, levelInformation);
+
+            StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation,
+                    levelInformation);
+            basePane.getChildren().set(1, gamePane);
+            try {
+                physicsEngine.start();
+            } catch (Exception startingPhysicsEngine) {
+                System.out.println("Error starting physics engine");
+                startingPhysicsEngine.printStackTrace();
+            }
+        });
+        victoryButtonRow.getChildren().add(victoryReplayButton);
+
+        Button nextLevelButton = createButton("nextLevelButton.png");
+        nextLevelButton.setOnAction(event -> {
+            LevelInformation nextLevelInformation = new LevelInformation();
+            nextLevelInformation.setLevelNumber(levelNumber+1);
+            PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth,gameHeight,loadoutInformation,nextLevelInformation);
+            StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation,
+                    nextLevelInformation);
+            basePane.getChildren().set(1, gamePane);
+            try {
+                physicsEngine.start();
+            } catch (Exception startingPhysicsEngine) {
+                System.out.println("Error starting physics engine");
+                startingPhysicsEngine.printStackTrace();
+            }
+        } );
+        victoryButtonRow.getChildren().add(nextLevelButton);
+
+        victoryPane.getChildren().add(victoryButtonRow);
+        victoryButtonRow.setAlignment(Pos.BOTTOM_CENTER);
 
         StackPane defeatPane = new StackPane();
         defeatPane.setMouseTransparent(true);
         defeatPane.setVisible(false);
         defeatPane.getChildren().add(importImage("defeatEndScreen.png"));
-        HBox defeatButtonRow = new HBox();
-        defeatButtonRow.getChildren().add(createButton("backButton.png"));
 
-        levelEndPane.getChildren().addAll(victoryPane,defeatPane);
+        HBox defeatButtonRow = new HBox();
+        Button defeatBackButton = createButton("backButton.png");
+        defeatBackButton.setOnAction(event -> {
+            BorderPane levelsPane = setupLevelsPane(basePane,loadoutInformation);
+            basePane.getChildren().set(1, levelsPane);
+        });
+        defeatButtonRow.getChildren().add(defeatBackButton);
+
+        Button defeatReplayButton = createButton("replayButton.png");
+        defeatReplayButton.setOnAction(event -> {
+            LevelInformation levelInformation = new LevelInformation();
+            levelInformation.setLevelNumber(levelNumber);
+            PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth,
+                    gameHeight, loadoutInformation, levelInformation);
+
+            StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation,
+                    levelInformation);
+            basePane.getChildren().set(1, gamePane);
+            try {
+                physicsEngine.start();
+            } catch (Exception startingPhysicsEngine) {
+                System.out.println("Error starting physics engine");
+                startingPhysicsEngine.printStackTrace();
+            }
+        });
+        defeatButtonRow.getChildren().add(defeatReplayButton);
+
+        defeatPane.getChildren().add(defeatButtonRow);
+        defeatButtonRow.setAlignment(Pos.BOTTOM_CENTER);
+
+        levelEndPane.getChildren().addAll(victoryPane, defeatPane);
         return levelEndPane;
     }
 
-    public HBox createLevelInformation (LevelInformation levelInformation,LoadoutInformation loadoutInformation) {
+    public HBox createLevelInformation(LevelInformation levelInformation, LoadoutInformation loadoutInformation) {
         HBox levelInformationDisplay = new HBox();
         levelInformationDisplay.setMouseTransparent(true); //Stop it blocking mouse clicks of below layers
         levelInformationDisplay.setAlignment(Pos.CENTER); //Make children go in middle
         levelInformationDisplay.setPadding(new Insets(10)); //Add padding on inside so its not right against the window
-        levelInformationDisplay.setMaxSize(Region.USE_PREF_SIZE,Region.USE_PREF_SIZE); //Makes it not take up the whole screen
+        levelInformationDisplay.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE); //Makes it not take up the whole screen
         levelInformationDisplay.setSpacing(5); //Add spacing between each child
 
-        ImageView projectileView = importImage(loadoutInformation.getProjectile().getName()+"Projectile.png");
+        ImageView projectileView = importImage(loadoutInformation.getProjectile().getName() + "Projectile.png");
         double projectileOriginalDimension = projectileView.getImage().getHeight();
-        projectileView.setFitHeight(projectileOriginalDimension/2);
-        projectileView.setFitWidth(projectileOriginalDimension/2);
+        projectileView.setFitHeight(projectileOriginalDimension / 2);
+        projectileView.setFitWidth(projectileOriginalDimension / 2);
 
         levelInformationDisplay.getChildren().add(projectileView);
         levelInformationDisplay.getChildren().add(importImage("X.png"));
@@ -202,8 +278,8 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
 
         ImageView coinView = importImage("coin.png");
         double coinOriginalDimension = coinView.getImage().getHeight();
-        coinView.setFitHeight(coinOriginalDimension/2);
-        coinView.setFitWidth(coinOriginalDimension/2);
+        coinView.setFitHeight(coinOriginalDimension / 2);
+        coinView.setFitWidth(coinOriginalDimension / 2);
 
         levelInformationDisplay.getChildren().add(coinView);
         levelInformationDisplay.getChildren().add(importImage("X.png"));
@@ -214,20 +290,20 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return levelInformationDisplay;
     }
 
-    public HBox makeNumberIntoSingleNode (int number){
+    public HBox makeNumberIntoSingleNode(int number) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
         String numberString = String.valueOf(number);
         for (int i = 0; i < numberString.length(); i++) {
-            hBox.getChildren().add(importImage(numberString.charAt(i)+".png"));
+            hBox.getChildren().add(importImage(numberString.charAt(i) + ".png"));
         }
         return hBox;
     }
 
-    public void updateLevelInformationDisplay(LevelInformation levelInformation, HBox hBox){
-        hBox.getChildren().set(2,makeNumberIntoSingleNode(levelInformation.getProjectilesRemaining()));
-        hBox.getChildren().set(5,makeNumberIntoSingleNode(levelInformation .getCoinsCollected()));
-        hBox.getChildren().set(7,makeNumberIntoSingleNode(levelInformation.getCoinsInLevel()));
+    public void updateLevelInformationDisplay(LevelInformation levelInformation, HBox hBox) {
+        hBox.getChildren().set(2, makeNumberIntoSingleNode(levelInformation.getProjectilesRemaining()));
+        hBox.getChildren().set(5, makeNumberIntoSingleNode(levelInformation.getCoinsCollected()));
+        hBox.getChildren().set(7, makeNumberIntoSingleNode(levelInformation.getCoinsInLevel()));
     }
 
     public BorderPane setupLoadoutPane(StackPane basePane, LoadoutInformation loadoutInformation) {
@@ -238,16 +314,16 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         });
 
         GridPane launcherGrid = new GridPane();
-        addLoadoutSelection(LauncherType.DEFAULT,launcherGrid,0,0,loadoutInformation,"defaultLauncher.png");
-        addLoadoutSelection(LauncherType.RAILGUN,launcherGrid,1,0,loadoutInformation,"railgunLauncher.png");
-        changeSelectedFrame(loadoutInformation.getLauncher(),launcherGrid);
+        addLoadoutSelection(LauncherType.DEFAULT, launcherGrid, 0, 0, loadoutInformation, "defaultLauncher.png");
+        addLoadoutSelection(LauncherType.RAILGUN, launcherGrid, 1, 0, loadoutInformation, "railgunLauncher.png");
+        changeSelectedFrame(loadoutInformation.getLauncher(), launcherGrid);
 
         GridPane projectileGrid = new GridPane();
         addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, 0, 0, loadoutInformation, "defaultProjectile.png");
         addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
         addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
         addLoadoutSelection(ProjectileType.NERD, projectileGrid, 1, 1, loadoutInformation, "nerdProjectile.png");
-        changeSelectedFrame(loadoutInformation.getProjectile(),projectileGrid); //Original set frame
+        changeSelectedFrame(loadoutInformation.getProjectile(), projectileGrid); //Original set frame
 
         HBox gridsWindow = new HBox();
         gridsWindow.setAlignment(Pos.CENTER);
@@ -265,14 +341,14 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         StackPane combinedImages = new StackPane(background, loadoutChoiceView);
         Button button = createButton(combinedImages);
         button.setOnAction(event -> {
-            if (loadoutOption instanceof ProjectileType){
-                loadoutInformation.setProjectile(((ProjectileType)loadoutOption));
+            if (loadoutOption instanceof ProjectileType) {
+                loadoutInformation.setProjectile(((ProjectileType) loadoutOption));
             } //Else, has to be a launcher
             else {
                 loadoutInformation.setLauncher(((LauncherType) loadoutOption));
             }
             writeToLoadoutInformation(loadoutInformation);
-            changeSelectedFrame(loadoutOption,grid); //Change frame whenever any button is pressed
+            changeSelectedFrame(loadoutOption, grid); //Change frame whenever any button is pressed
         });
         grid.add(button, i, j);
     }
@@ -324,32 +400,32 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     }
     //^AI, google
 
-    public LoadoutInformation importLoadoutInformation (){
-        LoadoutInformation loadoutInformation = new LoadoutInformation(LauncherType.DEFAULT,ProjectileType.DEFAULT);
+    public LoadoutInformation importLoadoutInformation() {
+        LoadoutInformation loadoutInformation = new LoadoutInformation(LauncherType.DEFAULT, ProjectileType.DEFAULT);
 
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
         Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
         Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
 
-        if (!Files.exists(furiousFlingersFolder)){
+        if (!Files.exists(furiousFlingersFolder)) {
             try {
                 Files.createDirectory(furiousFlingersFolder);
                 Files.createFile(loadoutFilePath);
                 writeToLoadoutInformation(new LoadoutInformation(LauncherType.DEFAULT,
                         ProjectileType.DEFAULT));
-            } catch (IOException creatingFuriousFlingersFolder){
+            } catch (IOException creatingFuriousFlingersFolder) {
                 System.out.println("Error creating Furious Flingers folder");
                 creatingFuriousFlingersFolder.printStackTrace();
             }
         }
 
-        if (Files.notExists(loadoutFilePath)){
+        if (Files.notExists(loadoutFilePath)) {
             try {
                 Files.createFile(loadoutFilePath);
                 writeToLoadoutInformation(new LoadoutInformation(LauncherType.DEFAULT,
                         ProjectileType.DEFAULT));
-            } catch (IOException creatingLoadoutFile){
+            } catch (IOException creatingLoadoutFile) {
                 System.out.println("Error creating loadout file");
                 creatingLoadoutFile.printStackTrace();
             }
@@ -357,15 +433,15 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
 
         String launcher = "default";
         String projectile = "default";
-        try (Scanner scan = new Scanner(loadoutFilePath)){
+        try (Scanner scan = new Scanner(loadoutFilePath)) {
             launcher = scan.nextLine();
             projectile = scan.nextLine();
-        } catch (IOException readingLoadoutFile){
+        } catch (IOException readingLoadoutFile) {
             System.out.println("Error reading loadout file");
             readingLoadoutFile.printStackTrace();
         }
 
-        switch (launcher){
+        switch (launcher) {
             case "railgun":
                 loadoutInformation.setLauncher(LauncherType.RAILGUN);
                 break;
@@ -373,7 +449,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
                 loadoutInformation.setLauncher(LauncherType.DEFAULT);
         }
 
-        switch (projectile){
+        switch (projectile) {
             case "bomb":
                 loadoutInformation.setProjectile(ProjectileType.BOMB);
                 break;
@@ -390,48 +466,48 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return loadoutInformation;
     }
 
-    public void changeSelectedFrame (LoadoutType loadoutOption , GridPane grid){
+    public void changeSelectedFrame(LoadoutType loadoutOption, GridPane grid) {
         //Reset all buttons
-        for (Node button:grid.getChildren()){
+        for (Node button : grid.getChildren()) {
             //Check to see if it has the 3rd layer in the stackpane (outline)
-            if (((StackPane)((Button)button).getGraphic()).getChildren().size()>2){
-                ((StackPane)((Button)button).getGraphic()).getChildren().remove(2);
+            if (((StackPane) ((Button) button).getGraphic()).getChildren().size() > 2) {
+                ((StackPane) ((Button) button).getGraphic()).getChildren().remove(2);
             }
         }
 
         //Add white frame on selected
         ImageView loadoutSelectedFrame = importImage("loadoutSelectedFrame.png");
-        if (loadoutOption == LauncherType.DEFAULT){
-            ((StackPane)((Button)grid.getChildren().get(0)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        if (loadoutOption == LauncherType.DEFAULT) {
+            ((StackPane) ((Button) grid.getChildren().get(0)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
-        if (loadoutOption == LauncherType.RAILGUN){
-            ((StackPane)((Button)grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        if (loadoutOption == LauncherType.RAILGUN) {
+            ((StackPane) ((Button) grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
 
-        if (loadoutOption == ProjectileType.DEFAULT){
-            ((StackPane)((Button)grid.getChildren().get(0)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        if (loadoutOption == ProjectileType.DEFAULT) {
+            ((StackPane) ((Button) grid.getChildren().get(0)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
-        if (loadoutOption == ProjectileType.BOMB){
-            ((StackPane)((Button)grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        if (loadoutOption == ProjectileType.BOMB) {
+            ((StackPane) ((Button) grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
-        if (loadoutOption == ProjectileType.MAGNETIC){
-            ((StackPane)((Button)grid.getChildren().get(2)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        if (loadoutOption == ProjectileType.MAGNETIC) {
+            ((StackPane) ((Button) grid.getChildren().get(2)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
-        if (loadoutOption == ProjectileType.NERD){
-            ((StackPane)((Button)grid.getChildren().get(3)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        if (loadoutOption == ProjectileType.NERD) {
+            ((StackPane) ((Button) grid.getChildren().get(3)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
     }
 
-    public void writeToLoadoutInformation (LoadoutInformation loadoutInformation){
+    public void writeToLoadoutInformation(LoadoutInformation loadoutInformation) {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
         Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
         Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
 
-        try (FileWriter fileWriter = new FileWriter(loadoutFilePath.toFile())){
-            fileWriter.write(loadoutInformation.getLauncher().getName()+"\n");
+        try (FileWriter fileWriter = new FileWriter(loadoutFilePath.toFile())) {
+            fileWriter.write(loadoutInformation.getLauncher().getName() + "\n");
             fileWriter.write(loadoutInformation.getProjectile().getName());
-        }catch (IOException writingToLoadoutFile){
+        } catch (IOException writingToLoadoutFile) {
             System.out.println("Error writing to loadout file");
             writingToLoadoutFile.printStackTrace();
         }

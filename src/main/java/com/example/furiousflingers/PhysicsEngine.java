@@ -25,6 +25,7 @@ public class PhysicsEngine implements ProjectileSpawner{
     private HBox levelInformationDisplay;
     private LevelInformationUpdater levelInformationUpdater;
     private StackPane endScreen;
+    private boolean levelEnded;
 
     public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation,
                           LevelInformation levelInformation){
@@ -42,9 +43,9 @@ public class PhysicsEngine implements ProjectileSpawner{
         return physicsEnginePane;
     }
 
-    public void start(int levelNumber) throws Exception {
+    public void start() throws Exception {
         addGround();
-        addLevel(levelNumber);
+        addLevel(levelInformation.getLevelNumber());
 
         AnimationTimer animationTimer = new AnimationTimer() {
             //Placeholder till start time is set
@@ -190,7 +191,7 @@ public class PhysicsEngine implements ProjectileSpawner{
                 //5 second delay then end
                 PauseTransition delay = new PauseTransition(Duration.seconds(5));
                 delay.setOnFinished(endGame -> {
-                     gameEnd(false);
+                    if (!levelEnded) gameEnd(false);
                 });
                 delay.play();
             }
@@ -289,14 +290,13 @@ public class PhysicsEngine implements ProjectileSpawner{
     }
 
     public void gameEnd (boolean isWin) {
+        levelEnded = true;
         endScreen.setVisible(true);
         endScreen.setMouseTransparent(false);
         if (isWin){
-            System.out.println("win");
             endScreen.getChildren().get(0).setVisible(true);
             endScreen.getChildren().get(0).setMouseTransparent(false);
         } else {
-            System.out.println("loss");
             endScreen.getChildren().get(1).setVisible(true);
             endScreen.getChildren().get(1).setMouseTransparent(false);
         }

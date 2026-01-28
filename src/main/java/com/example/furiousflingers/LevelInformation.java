@@ -4,6 +4,7 @@ public class LevelInformation {
     private int projectilesRemaining;
     private int coinsCollected;
     private int coinsInLevel;
+    private int levelNumber;
 
     public int getProjectilesRemaining() {
         return projectilesRemaining;
@@ -31,5 +32,13 @@ public class LevelInformation {
 
     public void setCoinsInLevel(int coinsInLevel) {
         this.coinsInLevel = coinsInLevel;
+    }
+
+    public int getLevelNumber() {
+        return levelNumber;
+    }
+
+    public void setLevelNumber(int levelNumber) {
+        this.levelNumber = levelNumber;
     }
 }
