@@ -40,19 +40,24 @@ public class MovableCircle extends Movable {
             //Circle checks
             if (entity instanceof MovableCircle){
                 //Pythagoras check for distance (keep squares because sqrt is bad for performance)
-                    if ((radius+((MovableCircle) entity).radius)*(radius+((MovableCircle) entity).radius)>=(position.getX()-entity.position.getX())*(position.getX()-entity.position.getX())
+                    if ((radius+((MovableCircle) entity).radius)*(radius+((MovableCircle) entity).radius)>=
+                            (position.getX()-entity.position.getX())*(position.getX()-entity.position.getX())
                         +(position.getY()-entity.position.getY())*(position.getY()-entity.position.getY())){
                     CollisionInformation collisionInformation = new CollisionInformation();
                     collisionInformation.setEntity2(entity);
                     collisionInformation.setCollisionNormal(entity.position.subtract(position).unitVector());
-                    collisionInformation.setPenetrationDepth(((MovableCircle) entity).radius+radius-entity.position.subtract(position).magnitude());
-                    collisionInformation.setCollisionPoint(entity.position.add(collisionInformation.getCollisionNormal().scalarMultiply(radius))); //Position + radius*collision normal = collision point
+                    collisionInformation.setPenetrationDepth(((MovableCircle) entity).radius+radius-
+                            entity.position.subtract(position).magnitude());
+                    collisionInformation.setCollisionPoint(entity.position.add(
+                            collisionInformation.getCollisionNormal().scalarMultiply(radius)));
+                    //Position + radius*collision normal = collision point
                     collisionInformationList.add(collisionInformation);
                 }
             }
 
             if (entity instanceof Rectangle) {
-                //Project circle centre onto each axis of rectangle, choose closest, if none then check all vertices for closest
+                //Project circle centre onto each axis of rectangle, choose closest,
+                // if none then check all vertices for closest
                 double closestDistance = Double.MAX_VALUE;
                 Vector closestPoint = new Vector(0,0); //GETS OVERRIDDEN
                 for (int i = 0; i < 4; i++) {
@@ -62,7 +67,8 @@ public class MovableCircle extends Movable {
                     Vector point1ToCircleCentre = position.subtract(facePoint1);
 
                     //Vector projection formula
-                    double scalarCoefficient = faceVector.dotProduct(point1ToCircleCentre)/(faceVector.magnitude()*faceVector.magnitude());
+                    double scalarCoefficient = faceVector.dotProduct(point1ToCircleCentre)/
+                            (faceVector.magnitude()*faceVector.magnitude());
                     if (scalarCoefficient>=0&&scalarCoefficient<=1){
                         Vector point1ToProjection = faceVector.scalarMultiply(scalarCoefficient);
                         double distance = point1ToProjection.subtract(point1ToCircleCentre).magnitude();
@@ -72,7 +78,8 @@ public class MovableCircle extends Movable {
                        }
                     }
                 }
-                //If no valid projection found (must be a corner), face to circle will always be closer if there is a valid projection
+                //If no valid projection found (must be a corner),
+                // face to circle will always be closer if there is a valid projection
                 if (closestDistance == Double.MAX_VALUE){
                     for (int i = 0; i < 4; i++) {
                         Vector vertex = ((Rectangle)entity).getVertices()[i];
@@ -99,8 +106,10 @@ public class MovableCircle extends Movable {
         //Things for every collision
         for (CollisionInformation collisionInformation : collisionInformationList){
             collisionInformation.setEntity1(this);
-            collisionInformation.setMomentArm1(collisionInformation.getCollisionPoint().subtract(collisionInformation.getEntity1().position));
-            collisionInformation.setMomentArm2(collisionInformation.getCollisionPoint().subtract(collisionInformation.getEntity2().position));
+            collisionInformation.setMomentArm1(collisionInformation.getCollisionPoint()
+                    .subtract(collisionInformation.getEntity1().position));
+            collisionInformation.setMomentArm2(collisionInformation.getCollisionPoint()
+                    .subtract(collisionInformation.getEntity2().position));
         }
         return collisionInformationList;
     }

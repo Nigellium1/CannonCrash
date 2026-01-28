@@ -12,10 +12,12 @@ public class MovableRectangle extends Movable implements Rectangle {
     private final ImageView rectangleView;
     private final double width;
     private final double height;
-    private Vector[] vertices = new Vector[4]; //0 - top left, 1 top right, 2 bottom right, 3 bottom left
+    private Vector[] vertices = new Vector[4]; //0 - top left, 1 top right,
+    // 2 bottom right, 3 bottom left
 
     public MovableRectangle(Vector position, Vector velocity, Vector acceleration,
-                            double orientation, double angularVelocity, double width, double height, Material material) {
+                            double orientation, double angularVelocity, double width, double height,
+                            Material material) {
         super(position,velocity,acceleration, orientation, angularVelocity, material);
         this.width = width;
         this.height = height;
@@ -31,7 +33,8 @@ public class MovableRectangle extends Movable implements Rectangle {
     }
 
     public void updateAppearance (){
-        rectangleView.setX(position.getX()-width/2); //Rectangle shape position is top left corner so I take my center of mass and subtract half width and height to get top left corner
+        rectangleView.setX(position.getX()-width/2); //Rectangle shape position is top left corner
+        // so I take my center of mass and subtract half width and height to get top left corner
         rectangleView.setY(position.getY()-height/2);
         rectangleView.setRotate(-orientation*(180/Math.PI));
     }
@@ -230,8 +233,12 @@ public class MovableRectangle extends Movable implements Rectangle {
         return axes;
     }
 
-    public Vector findIntersection (Vector point1, Vector directionVector1,Vector point2, Vector directionVector2){
-        double scalarMultiplier = (point2.subtract(point1).vectorVectorCrossProduct(directionVector2))/directionVector1.vectorVectorCrossProduct(directionVector2); //Like lambda in maths for vectors
+    public Vector findIntersection (Vector point1, Vector directionVector1,Vector point2,
+                                    Vector directionVector2){
+        double scalarMultiplier = (point2.subtract(point1).
+                vectorVectorCrossProduct(directionVector2))/
+                directionVector1.vectorVectorCrossProduct(directionVector2);
+        //Like lambda in maths for vectors
         return point1.add(directionVector1.scalarMultiply(scalarMultiplier));
     }
 
@@ -242,8 +249,8 @@ public class MovableRectangle extends Movable implements Rectangle {
             if (incidentProjection<referenceProjection){
                 Vector referenceDirectionVector = clippingNormal.perpendicularise();
                 Vector incidentDirectionVector = incidentFace[1].subtract(incidentFace[0]);
-                incidentFace[i] = findIntersection(referenceClippingPoint,referenceDirectionVector,incidentFace[i],
-                        incidentDirectionVector);
+                incidentFace[i] = findIntersection(referenceClippingPoint,referenceDirectionVector,
+                        incidentFace[i], incidentDirectionVector);
             }
         }
         return incidentFace;

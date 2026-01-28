@@ -110,7 +110,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
                     PhysicsEngine physicsEngine = new PhysicsEngine(levelButton.getScene().getWidth(),
                             levelButton.getScene().getHeight(), loadoutInformation,levelInformation);
 
-                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation,levelInformation);
+                    StackPane gamePane = setupGamePane(physicsEngine,basePane,loadoutInformation,levelInformation,levelNumber);
 
                     basePane.getChildren().set(1, gamePane);
                     try {
@@ -132,7 +132,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     }
 
     public StackPane setupGamePane (PhysicsEngine physicsEngine, StackPane basePane, LoadoutInformation loadoutInformation
-    , LevelInformation levelInformation){
+    , LevelInformation levelInformation, int levelNumber){
         StackPane gamePane = new StackPane();
         Pane physicsEnginePane = physicsEngine.getPhysicsEnginePane();
         gamePane.getChildren().add(physicsEnginePane);
@@ -149,10 +149,38 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         gamePane.getChildren().add(levelInformationDisplay);
         gamePane.setAlignment(levelInformationDisplay,Pos.TOP_RIGHT);
 
+        StackPane levelEndPane = setupLevelEndPane();
+        gamePane.getChildren().add(levelEndPane);
+        gamePane.setAlignment(levelEndPane,Pos.CENTER);
+
         physicsEngine.setLevelInformationUpdater(this::updateLevelInformationDisplay);
         physicsEngine.setLevelInformationDisplay(levelInformationDisplay);
+        physicsEngine.setEndScreen(levelEndPane);
 
         return gamePane;
+    }
+
+    public StackPane setupLevelEndPane (){
+        StackPane levelEndPane = new StackPane();
+        levelEndPane.setMouseTransparent(true);
+
+        StackPane victoryPane = new StackPane();
+        victoryPane.setMouseTransparent(true);
+        victoryPane.setVisible(false);
+        victoryPane.getChildren().add(importImage("victoryEndScreen.png"));
+        HBox victoryButtonRow = new HBox();
+        victoryButtonRow.getChildren().add(createButton("backButton.png"));
+
+
+        StackPane defeatPane = new StackPane();
+        defeatPane.setMouseTransparent(true);
+        defeatPane.setVisible(false);
+        defeatPane.getChildren().add(importImage("defeatEndScreen.png"));
+        HBox defeatButtonRow = new HBox();
+        defeatButtonRow.getChildren().add(createButton("backButton.png"));
+
+        levelEndPane.getChildren().addAll(victoryPane,defeatPane);
+        return levelEndPane;
     }
 
     public HBox createLevelInformation (LevelInformation levelInformation,LoadoutInformation loadoutInformation) {

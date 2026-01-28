@@ -7,6 +7,7 @@ import javafx.animation.PauseTransition;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
 import java.io.InputStream;
@@ -23,6 +24,7 @@ public class PhysicsEngine implements ProjectileSpawner{
     private LevelInformation levelInformation;
     private HBox levelInformationDisplay;
     private LevelInformationUpdater levelInformationUpdater;
+    private StackPane endScreen;
 
     public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation,
                           LevelInformation levelInformation){
@@ -79,7 +81,7 @@ public class PhysicsEngine implements ProjectileSpawner{
                             if (levelInformation.getCoinsCollected() == levelInformation.getCoinsInLevel()){
                                 PauseTransition delay = new PauseTransition(Duration.seconds(1));
                                 delay.setOnFinished(endGame -> {
-                                    gameEnd();
+                                    gameEnd(true);
                                 });
                                 delay.play();
                             }
@@ -118,7 +120,7 @@ public class PhysicsEngine implements ProjectileSpawner{
                             if (levelInformation.getCoinsCollected() == levelInformation.getCoinsInLevel()){
                                 PauseTransition delay = new PauseTransition(Duration.seconds(1));
                                 delay.setOnFinished(endGame -> {
-                                    gameEnd();
+                                    gameEnd(true);
                                 });
                                 delay.play();
                             }
@@ -188,7 +190,7 @@ public class PhysicsEngine implements ProjectileSpawner{
                 //5 second delay then end
                 PauseTransition delay = new PauseTransition(Duration.seconds(5));
                 delay.setOnFinished(endGame -> {
-                     gameEnd();
+                     gameEnd(false);
                 });
                 delay.play();
             }
@@ -286,8 +288,18 @@ public class PhysicsEngine implements ProjectileSpawner{
         }
     }
 
-    public void gameEnd () {
-        System.out.println("TEMP GAME END");
+    public void gameEnd (boolean isWin) {
+        endScreen.setVisible(true);
+        endScreen.setMouseTransparent(false);
+        if (isWin){
+            System.out.println("win");
+            endScreen.getChildren().get(0).setVisible(true);
+            endScreen.getChildren().get(0).setMouseTransparent(false);
+        } else {
+            System.out.println("loss");
+            endScreen.getChildren().get(1).setVisible(true);
+            endScreen.getChildren().get(1).setMouseTransparent(false);
+        }
     }
 
     public void setLevelInformationDisplay(HBox levelInformationDisplay) {
@@ -296,6 +308,10 @@ public class PhysicsEngine implements ProjectileSpawner{
 
     public void setLevelInformationUpdater(LevelInformationUpdater levelInformationUpdater) {
         this.levelInformationUpdater = levelInformationUpdater;
+    }
+
+    public void setEndScreen(StackPane endScreen) {
+        this.endScreen = endScreen;
     }
 }
 
