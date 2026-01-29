@@ -10,17 +10,19 @@ import java.io.InputStream;
 
 public class Launcher {
     private final Vector position;
-    private ImageView launcherBaseView;
+    private final LauncherType launcherType;
     private ImageView launcherTurretView;
     private boolean isProjectileLive; //Is there a valid projectile being dragged right now
     private ProjectileSpawner projectileSpawner;
     private MovableCircle currentProjectile;
     double allowedRadius = 100; //Might change this
 
-    public Launcher(Vector position, Pane physicsEnginePane, ProjectileSpawner projectileSpawner,LauncherType launcher) {
+    public Launcher(Vector position, Pane physicsEnginePane, ProjectileSpawner projectileSpawner,
+                    LauncherType launcherType) {
         this.position = position;
-        launcherBaseView = importImage(launcher.getName()+"LauncherBase.png");
-        launcherTurretView = importImage(launcher.getName()+"LauncherTurret.png");
+        this.launcherType = launcherType;
+        ImageView launcherBaseView = importImage(launcherType.getName()+"LauncherBase.png");
+        launcherTurretView = importImage(launcherType.getName()+"LauncherTurret.png");
 
         //ImageView position is top left whereas position we are defining to be centre
         launcherTurretView.setX(position.getX() - launcherTurretView.getImage().getWidth() / 2);
@@ -35,34 +37,33 @@ public class Launcher {
         this.projectileSpawner = projectileSpawner;
     }
 
-    public void handleMousePress(MouseEvent event, ProjectileType projectile, LevelInformation levelInformation,
-                                 HBox levelInformationDisplay, LevelInformationUpdater levelInformationUpdater) {
+    public void handleMousePress(MouseEvent event, ProjectileType projectile) {
         Vector eventPosition = new Vector(event.getX(), event.getY());
         //If click position is outside of circle (approximate circle with radius of half the largest dimension of image
         if (eventPosition.subtract(position).magnitude() > allowedRadius) {
             return;
         }
         isProjectileLive = true;
-        levelInformation.minusProjectilesRemaining();
-        levelInformationUpdater.updateLevelInformationDisplay(levelInformation,levelInformationDisplay);
         if (projectile == ProjectileType.BOMB){
             //Actual image radius is 28 but it looks better if hitbox is slightly smaller than image (no gaps)
             currentProjectile = new BombProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
-                    Material.WOOD,"bombProjectile.png");
+                    Material.WOOD,ProjectileType.BOMB);
         } else {
             currentProjectile = new Projectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
-                    Material.WOOD, "defaultProjectile.png");
+                    Material.WOOD, ProjectileType.DEFAULT);
         }
         projectileSpawner.addMovableCircle(currentProjectile);
 
         rotateLauncherTurret(eventPosition);
     }
 
-    public void handleMouseRelease (MouseEvent event){
+    public void handleMouseRelease (LevelInformation levelInformation,HBox levelInformationDisplay, LevelInformationUpdater levelInformationUpdater){
         if (!isProjectileLive){
             return;
         }
         isProjectileLive = false;
+        levelInformation.minusProjectilesRemaining();
+        levelInformationUpdater.updateLevelInformationDisplay(levelInformation,levelInformationDisplay);
         currentProjectile.acceleration = new Vector(0,1000);
         double velocityMultiplier = currentProjectile.position.subtract(position).magnitude()/allowedRadius;
         currentProjectile.velocity = position.subtract(currentProjectile.position).unitVector().scalarMultiply(1000*velocityMultiplier);

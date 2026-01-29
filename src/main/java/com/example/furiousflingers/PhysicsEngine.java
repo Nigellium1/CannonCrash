@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class PhysicsEngine implements ProjectileSpawner{
+public class PhysicsEngine implements ProjectileSpawner {
     private final double sceneWidth;
     private final double sceneHeight;
     private Pane physicsEnginePane;
@@ -30,8 +30,8 @@ public class PhysicsEngine implements ProjectileSpawner{
     private StackPane endScreen;
     private boolean levelEnded;
 
-    public PhysicsEngine (double sceneWidth,double sceneHeight, LoadoutInformation loadoutInformation,
-                          LevelInformation levelInformation){
+    public PhysicsEngine(double sceneWidth, double sceneHeight, LoadoutInformation loadoutInformation,
+                         LevelInformation levelInformation) {
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
         entities = new ArrayList<>();
@@ -78,11 +78,11 @@ public class PhysicsEngine implements ProjectileSpawner{
                     if (entities.get(i).position.getX() - 100 > sceneWidth ||
                             entities.get(i).position.getX() + 100 < 0 ||
                             entities.get(i).position.getY() - 100 > sceneHeight ||
-                            entities.get(i).position.getY()<-500) { //Add roof but really high up only for railgun launcher)
-                        if (entities.get(i) instanceof Coin){
+                            entities.get(i).position.getY() < -500) { //Add roof but really high up only for railgun launcher)
+                        if (entities.get(i) instanceof Coin) {
                             levelInformation.addCoinCollected();
-                            levelInformationUpdater.updateLevelInformationDisplay(levelInformation,levelInformationDisplay);
-                            if (levelInformation.getCoinsCollected() == levelInformation.getCoinsInLevel()){
+                            levelInformationUpdater.updateLevelInformationDisplay(levelInformation, levelInformationDisplay);
+                            if (levelInformation.getCoinsCollected() == levelInformation.getCoinsInLevel()) {
                                 PauseTransition delay = new PauseTransition(Duration.seconds(1));
                                 delay.setOnFinished(endGame -> {
                                     gameEnd(true);
@@ -115,13 +115,13 @@ public class PhysicsEngine implements ProjectileSpawner{
                         }
                     }
                     //Remove collected coins
-                    if (entities.get(i) instanceof Coin){
-                        if (((Coin)entities.get(i)).isRemoveThisInstance()){
+                    if (entities.get(i) instanceof Coin) {
+                        if (((Coin) entities.get(i)).isRemoveThisInstance()) {
                             removeEntity(i);
                             i--;
                             levelInformation.addCoinCollected();
-                            levelInformationUpdater.updateLevelInformationDisplay(levelInformation,levelInformationDisplay);
-                            if (levelInformation.getCoinsCollected() == levelInformation.getCoinsInLevel()){
+                            levelInformationUpdater.updateLevelInformationDisplay(levelInformation, levelInformationDisplay);
+                            if (levelInformation.getCoinsCollected() == levelInformation.getCoinsInLevel()) {
                                 PauseTransition delay = new PauseTransition(Duration.seconds(1));
                                 delay.setOnFinished(endGame -> {
                                     gameEnd(true);
@@ -140,20 +140,30 @@ public class PhysicsEngine implements ProjectileSpawner{
                 }
 
                 //Friction
-                for (CollisionInformation collisionInformation : collisionInformationList){
+                for (CollisionInformation collisionInformation : collisionInformationList) {
                     collisionInformation.getEntity1().resolveFriction(collisionInformation);
                 }
 
                 //Position correction
-                for (CollisionInformation collisionInformation : collisionInformationList){
-                    collisionInformation.getEntity1().positionCorrection(collisionInformation.getEntity1(),collisionInformation.getEntity2()
-                            , collisionInformation.getPenetrationDepth(),collisionInformation.getCollisionNormal());
+                for (CollisionInformation collisionInformation : collisionInformationList) {
+                    collisionInformation.getEntity1().positionCorrection(collisionInformation.getEntity1(), collisionInformation.getEntity2()
+                            , collisionInformation.getPenetrationDepth(), collisionInformation.getCollisionNormal());
                 }
 
                 //Update appearance of entities using their position vector
-                for (Entity entity : entities){
+                for (Entity entity : entities) {
                     if (entity instanceof Movable) {
                         ((Movable) entity).updateAppearance();
+                    }
+                }
+
+                //Check projectiles to see if gravity needs to be added (railgun)
+                for (CollisionInformation collisionInformation : collisionInformationList) {
+                    if (collisionInformation.getEntity1() instanceof Projectile) {
+                        ((Projectile) collisionInformation.getEntity1()).addGravity();
+                    }
+                    if (collisionInformation.getEntity2() instanceof Projectile) {
+                        ((Projectile) collisionInformation.getEntity2()).addGravity();
                     }
                 }
 
@@ -171,26 +181,38 @@ public class PhysicsEngine implements ProjectileSpawner{
 
     public void addMovableCircle(Vector position, Vector velocity, Vector acceleration,
                                  double orientation, double angularVelocity, Material material, String imageName) {
-        MovableCircle circle = new MovableCircle(position,velocity,acceleration,
-                 27,orientation,angularVelocity,material,imageName);
+        MovableCircle circle = new MovableCircle(position, velocity, acceleration,
+                27, orientation, angularVelocity, material, imageName);
         physicsEnginePane.getChildren().add(circle.getCircleView());
         entities.add(circle);
     }
     //FOR LEFT CLICK SPAWNING CIRLCES TESTING
 
     //So launcher can have the circle it creates
-    public void addMovableCircle (MovableCircle circle){
+    public void addMovableCircle(MovableCircle circle) {
         physicsEnginePane.getChildren().add(circle.getCircleView());
         entities.add(circle);
     }
 
-    public void addClickFunctionality (Launcher launcher){
+    public void addClickFunctionality(Launcher launcher) {
         physicsEnginePane.setOnMousePressed(event -> {
-            if (levelInformation.getProjectilesRemaining()==0){
+            if (levelInformation.getProjectilesRemaining() == 0) {
                 return; //If all projectiles used, don't let anymore
             }
-            launcher.handleMousePress(event,projectile,levelInformation,levelInformationDisplay,levelInformationUpdater);
-            if (levelInformation.getProjectilesRemaining()==0){
+            launcher.handleMousePress(event, projectile);
+//            if (event.isPrimaryButtonDown()){
+//                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
+//                        120,60,0,Material.STONE);
+//            }
+            if (event.isSecondaryButtonDown()) {
+                addMovableRectangle(new Vector(event.getX(), event.getY()), new Vector(0, 0), new Vector(0, 1000),
+                        120, 60, 0, Material.WOOD);
+            }
+        });
+
+        physicsEnginePane.setOnMouseReleased(event -> {
+            launcher.handleMouseRelease(levelInformation, levelInformationDisplay, levelInformationUpdater);
+            if (levelInformation.getProjectilesRemaining() == 0) {
                 //5 second delay then end
                 PauseTransition delay = new PauseTransition(Duration.seconds(5));
                 delay.setOnFinished(endGame -> {
@@ -198,18 +220,6 @@ public class PhysicsEngine implements ProjectileSpawner{
                 });
                 delay.play();
             }
-//            if (event.isPrimaryButtonDown()){
-//                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
-//                        120,60,0,Material.STONE);
-//            }
-            if (event.isSecondaryButtonDown()){
-                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
-                        120,60,0,Material.WOOD);
-            }
-        });
-
-        physicsEnginePane.setOnMouseReleased(event -> {
-            launcher.handleMouseRelease(event);
         });
 
         physicsEnginePane.setOnMouseDragged(event -> {
@@ -219,87 +229,87 @@ public class PhysicsEngine implements ProjectileSpawner{
 
     public void addMovableRectangle(Vector position, Vector velocity, Vector acceleration,
                                     double width, double height, double orientation, Material material) {
-        MovableRectangle rectangle = new MovableRectangle(position,velocity,acceleration,orientation,0,width,height,material);
+        MovableRectangle rectangle = new MovableRectangle(position, velocity, acceleration, orientation, 0, width, height, material);
         physicsEnginePane.getChildren().add(rectangle.getRectangle());
         entities.add(rectangle);
     }
 
     public void addImmovableRectangle(ArrayList<Entity> entities, Vector position, double width, double height, Material material, String imagePath) {
-        ImmovableRectangle rectangle = new ImmovableRectangle(position,0,width,height,material,imagePath);
+        ImmovableRectangle rectangle = new ImmovableRectangle(position, 0, width, height, material, imagePath);
         ImageView rectangleView = rectangle.getRectangleView();
         rectangleView.setY(440); //Shift downwards
         physicsEnginePane.getChildren().add(rectangleView);
         entities.add(rectangle);
     }
 
-    public void addGround (){
-        addImmovableRectangle(entities,new Vector(sceneWidth/2,sceneHeight-30),sceneWidth,60,Material.IMMOVABLE, "floor.png");
+    public void addGround() {
+        addImmovableRectangle(entities, new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth, 60, Material.IMMOVABLE, "floor.png");
     }
 
-    public Launcher addLauncher (){
+    public Launcher addLauncher() {
         ProjectileSpawner projectileSpawner = this;
-        return new Launcher(new Vector(150,300), physicsEnginePane, projectileSpawner,launcher);
+        return new Launcher(new Vector(150, 300), physicsEnginePane, projectileSpawner, launcher);
     }
 
-    public void removeEntity (int index) {
-        int differenceInListSizes = Math.abs(physicsEnginePane.getChildren().size()-entities.size());
-        physicsEnginePane.getChildren().remove(index+differenceInListSizes); //Pane includes launcher which isn't part of entities so lists are out of sync by 1
+    public void removeEntity(int index) {
+        int differenceInListSizes = Math.abs(physicsEnginePane.getChildren().size() - entities.size());
+        physicsEnginePane.getChildren().remove(index + differenceInListSizes); //Pane includes launcher which isn't part of entities so lists are out of sync by 1
         entities.remove(index);
     }
 
-    public void addCoin (Vector position, Vector velocity, Vector acceleration, double orientation, double angularVelocity, Material material) {
-        Coin coin = new Coin(position,velocity,acceleration,27,orientation,angularVelocity, material);
+    public void addCoin(Vector position, Vector velocity, Vector acceleration, double orientation, double angularVelocity, Material material) {
+        Coin coin = new Coin(position, velocity, acceleration, 27, orientation, angularVelocity, material);
         physicsEnginePane.getChildren().add(coin.getCircleView());
         entities.add(coin);
     }
 
-    public void addLevel (int levelNumber) {
-        String fileName = levelNumber+".txt";
+    public void addLevel(int levelNumber) {
+        String fileName = levelNumber + ".txt";
         InputStream inputStream = this.getClass().getResourceAsStream(fileName);
         //First line will be number of coins
         //Second line will be number of projectiles
         //Line structure: shape, material (includes immovable), position x, position y, orientation (IN DEGREES CUS I DONT KNOW HOW TO WRITE PI)
-        try (Scanner scan = new Scanner(inputStream)){
+        try (Scanner scan = new Scanner(inputStream)) {
             levelInformation.setCoinsInLevel(Integer.valueOf(scan.nextLine()));
             levelInformation.setProjectilesRemaining(Integer.valueOf(scan.nextLine()));
-            levelInformationUpdater.updateLevelInformationDisplay(levelInformation,levelInformationDisplay);
-            while (scan.hasNext()){
+            levelInformationUpdater.updateLevelInformationDisplay(levelInformation, levelInformationDisplay);
+            while (scan.hasNext()) {
                 String instructionLine = scan.nextLine();
-                String [] instructionArray = instructionLine.split(",");
+                String[] instructionArray = instructionLine.split(",");
                 String shape = instructionArray[0];
                 Material material = Material.valueOf(instructionArray[1].toUpperCase());
                 double xPosition = Double.valueOf(instructionArray[2]);
                 double yPosition = Double.valueOf(instructionArray[3]);
-                double orientation = Double.valueOf(instructionArray[4])*(Math.PI/180); //Convert back to radians
+                double orientation = Double.valueOf(instructionArray[4]) * (Math.PI / 180); //Convert back to radians
 
-                if (material == Material.IMMOVABLE){
+                if (material == Material.IMMOVABLE) {
 
                 } else if (shape.equals("coin")) {
-                    addCoin(new Vector(xPosition,yPosition),new Vector(0,0),new Vector(0,1000),orientation,0, material);
+                    addCoin(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000), orientation, 0, material);
                 } else { //Else movable
-                    if (shape.equals("circle")){
-                        addMovableCircle(new Vector(xPosition,yPosition),new Vector(0,0),new Vector(0,1000),
-                                orientation,0,material,instructionArray[1]+"Circle.png");
+                    if (shape.equals("circle")) {
+                        addMovableCircle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),
+                                orientation, 0, material, instructionArray[1] + "Circle.png");
                     } else { //Else rectangle
-                        addMovableRectangle(new Vector(xPosition,yPosition),new Vector(0,0),new Vector(0,1000),
-                            120,60,orientation, material);
+                        addMovableRectangle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),
+                                120, 60, orientation, material);
                     }
                 }
             }
-        } catch (Exception readingLevel){
+        } catch (Exception readingLevel) {
             System.out.println("Error reading level");
             readingLevel.printStackTrace();
         }
     }
 
-    public void gameEnd (boolean isWin) {
+    public void gameEnd(boolean isWin) {
         levelEnded = true;
         endScreen.setVisible(true);
         endScreen.setMouseTransparent(false);
-        if (isWin){
+        if (isWin) {
             endScreen.getChildren().get(0).setVisible(true);
             endScreen.getChildren().get(0).setMouseTransparent(false);
-            writeToLevelsCompleted(levelInformation.getLevelNumber()+1);
+            writeToLevelsCompleted(levelInformation.getLevelNumber() + 1);
         } else {
             endScreen.getChildren().get(1).setVisible(true);
             endScreen.getChildren().get(1).setMouseTransparent(false);
@@ -318,7 +328,7 @@ public class PhysicsEngine implements ProjectileSpawner{
         this.endScreen = endScreen;
     }
 
-    public void writeToLevelsCompleted (int levelsCompleted) {
+    public void writeToLevelsCompleted(int levelsCompleted) {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
         Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
