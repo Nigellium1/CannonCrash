@@ -80,7 +80,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     }
 
     public BorderPane setupLevelsPane(StackPane basePane, LoadoutInformation loadoutInformation) {
-        int levelsUnlocked = importLevelsCompleted(); //THIS SHOULD BE PASSED TO THE ROUTINE
+        int levelsUnlocked = importLevelsCompleted();
 
         Button backButton = createButton("backButton.png");
         backButton.setOnAction(event -> {
@@ -93,7 +93,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         buttonsWindow.setVgap(10);
         buttonsWindow.setAlignment(Pos.CENTER);
         buttonsWindow.setPrefColumns(5);
-        buttonsWindow.setMaxSize(Region.USE_PREF_SIZE,Region.USE_PREF_SIZE);
+        buttonsWindow.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
         int levelCounter = 0;
         for (int i = 0; i < 10; i++) {
@@ -319,16 +319,34 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
             basePane.getChildren().set(1, menuPane);
         });
 
-        GridPane launcherGrid = new GridPane();
-        addLoadoutSelection(LauncherType.DEFAULT, launcherGrid, 0, 0, loadoutInformation, "defaultLauncher.png");
-        addLoadoutSelection(LauncherType.RAILGUN, launcherGrid, 1, 0, loadoutInformation, "railgunLauncher.png");
+        int levelsUnlocked = importLevelsCompleted();
+
+        TilePane launcherGrid = new TilePane();
+        launcherGrid.setPrefColumns(2);
+        addLoadoutSelection(LauncherType.DEFAULT, launcherGrid, loadoutInformation,
+                "defaultLauncher.png",true);
+        boolean railGunUnlocked = false;
+        if (levelsUnlocked>=5) railGunUnlocked = true;
+        addLoadoutSelection(LauncherType.RAILGUN, launcherGrid, loadoutInformation,
+                "railgunLauncher.png",railGunUnlocked);
         changeSelectedFrame(loadoutInformation.getLauncher(), launcherGrid);
 
-        GridPane projectileGrid = new GridPane();
-        addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, 0, 0, loadoutInformation, "defaultProjectile.png");
-        addLoadoutSelection(ProjectileType.BOMB, projectileGrid, 1, 0, loadoutInformation, "bombProjectile.png");
-        addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, 0, 1, loadoutInformation, "magneticProjectile.png");
-        addLoadoutSelection(ProjectileType.NERD, projectileGrid, 1, 1, loadoutInformation, "nerdProjectile.png");
+        TilePane projectileGrid = new TilePane();
+        projectileGrid.setPrefColumns(2);
+        addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, loadoutInformation,
+                "defaultProjectile.png",true);
+        boolean bombUnlocked = false;
+        if (levelsUnlocked>=4) bombUnlocked = true;
+        addLoadoutSelection(ProjectileType.BOMB, projectileGrid, loadoutInformation,
+                "bombProjectile.png",bombUnlocked);
+        boolean magneticUnlocked = false;
+        if (levelsUnlocked >=6) magneticUnlocked = true;
+        addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, loadoutInformation,
+                "magneticProjectile.png",magneticUnlocked);
+        boolean nerdUnlocked = false;
+        if (levelsUnlocked>=10) nerdUnlocked = true;
+        addLoadoutSelection(ProjectileType.NERD, projectileGrid, loadoutInformation,
+                "nerdProjectile.png",nerdUnlocked);
         changeSelectedFrame(loadoutInformation.getProjectile(), projectileGrid); //Original set frame
 
         HBox gridsWindow = new HBox();
@@ -341,22 +359,33 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return loadoutPane;
     }
 
-    public void addLoadoutSelection(LoadoutType loadoutOption, GridPane grid, int i, int j, LoadoutInformation loadoutInformation, String imagePath) {
+    public void addLoadoutSelection(LoadoutType loadoutOption, TilePane grid,
+                                    LoadoutInformation loadoutInformation, String imagePath, boolean unlocked) {
         ImageView background = importImage("loadoutBackground.png"); //Same background for projectiles and launchers
         ImageView loadoutChoiceView = importImage(imagePath);
-        StackPane combinedImages = new StackPane(background, loadoutChoiceView);
-        Button button = createButton(combinedImages);
-        button.setOnAction(event -> {
-            if (loadoutOption instanceof ProjectileType) {
-                loadoutInformation.setProjectile(((ProjectileType) loadoutOption));
-            } //Else, has to be a launcher
-            else {
-                loadoutInformation.setLauncher(((LauncherType) loadoutOption));
-            }
-            writeToLoadoutInformation(loadoutInformation);
-            changeSelectedFrame(loadoutOption, grid); //Change frame whenever any button is pressed
-        });
-        grid.add(button, i, j);
+
+        if (unlocked) {
+            StackPane combinedImages = new StackPane(background, loadoutChoiceView);
+            Button button = createButton(combinedImages);
+            button.setOnAction(event -> {
+                if (loadoutOption instanceof ProjectileType) {
+                    loadoutInformation.setProjectile(((ProjectileType) loadoutOption));
+                } //Else, has to be a launcher
+                else {
+                    loadoutInformation.setLauncher(((LauncherType) loadoutOption));
+                }
+                writeToLoadoutInformation(loadoutInformation);
+                changeSelectedFrame(loadoutOption, grid); //Change frame whenever any button is pressed
+            });
+            grid.getChildren().add(button);
+        } else {
+            background.setOpacity(0.7);
+            loadoutChoiceView.setOpacity(0.7);
+            ImageView lock = importImage("lock.png");
+            StackPane.setAlignment(lock,Pos.TOP_RIGHT);
+            StackPane combinedImages = new StackPane(background,loadoutChoiceView,lock);
+            grid.getChildren().add(combinedImages);
+        }
     }
 
     public Button createButton(String imageName) {
@@ -400,11 +429,11 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         });
         button.setOnMouseExited(e -> {
             button.setEffect(null);
-            button.setTranslateX(2);
-            button.setTranslateY(2);
+            button.setTranslateX(0);
+            button.setTranslateY(0);
         });
     }
-    //^AI, google
+    //^AI, google, with some tweaks
 
     public LoadoutInformation importLoadoutInformation() {
         LoadoutInformation loadoutInformation = new LoadoutInformation(LauncherType.DEFAULT, ProjectileType.DEFAULT);
@@ -472,12 +501,14 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         return loadoutInformation;
     }
 
-    public void changeSelectedFrame(LoadoutType loadoutOption, GridPane grid) {
+    public void changeSelectedFrame(LoadoutType loadoutOption, TilePane grid) {
         //Reset all buttons
         for (Node button : grid.getChildren()) {
-            //Check to see if it has the 3rd layer in the stackpane (outline)
-            if (((StackPane) ((Button) button).getGraphic()).getChildren().size() > 2) {
-                ((StackPane) ((Button) button).getGraphic()).getChildren().remove(2);
+            if (button instanceof Button) {
+                //Check to see if it has the 3rd layer in the stackpane (outline)
+                if (((StackPane) ((Button) button).getGraphic()).getChildren().size() > 2) {
+                    ((StackPane) ((Button) button).getGraphic()).getChildren().remove(2);
+                }
             }
         }
 
