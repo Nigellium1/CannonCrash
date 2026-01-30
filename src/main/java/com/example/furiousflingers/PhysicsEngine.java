@@ -13,6 +13,7 @@ import javafx.util.Duration;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -64,6 +65,20 @@ public class PhysicsEngine implements ProjectileSpawner {
                 }
                 //Current time in relation to when first cycle started
                 double timeInSecs = now / 1000000000.0 - startTime;
+
+                //Sleep checks for all entities
+                for (Entity entity : entities){
+                    //Only movables need to sleep
+                    if (entity instanceof Movable){
+                        if (entity instanceof Projectile){
+                            if (((Projectile) entity).isHasCollided()){
+                                ((Projectile) entity).sleepChecks();
+                            }
+                        } else {
+                            ((Movable) entity).sleepChecks();
+                        }
+                    }
+                }
 
                 //Standard update all entities
                 for (Entity entity : entities) {
@@ -161,9 +176,11 @@ public class PhysicsEngine implements ProjectileSpawner {
                 for (CollisionInformation collisionInformation : collisionInformationList) {
                     if (collisionInformation.getEntity1() instanceof Projectile) {
                         ((Projectile) collisionInformation.getEntity1()).addGravity();
+                        ((Projectile) collisionInformation.getEntity1()).setHasCollided(true);
                     }
                     if (collisionInformation.getEntity2() instanceof Projectile) {
                         ((Projectile) collisionInformation.getEntity2()).addGravity();
+                        ((Projectile) collisionInformation.getEntity2()).setHasCollided(true);
                     }
                 }
 
@@ -309,7 +326,8 @@ public class PhysicsEngine implements ProjectileSpawner {
         if (isWin) {
             endScreen.getChildren().get(0).setVisible(true);
             endScreen.getChildren().get(0).setMouseTransparent(false);
-            writeToLevelsCompleted(levelInformation.getLevelNumber() + 1);
+            int levelsCompleted = importLevelsCompleted();
+            writeToLevelsCompleted(Math.max(levelInformation.getLevelNumber() + 1,levelsCompleted));
         } else {
             endScreen.getChildren().get(1).setVisible(true);
             endScreen.getChildren().get(1).setMouseTransparent(false);
@@ -340,6 +358,44 @@ public class PhysicsEngine implements ProjectileSpawner {
             System.out.println("Error writing to levels completed file");
             writingToLevelsCompletedFile.printStackTrace();
         }
+    }
+
+    public int importLevelsCompleted() {
+        String localAppDataFolderPathString = System.getenv("localappdata");
+        Path localAppDataPath = Path.of(localAppDataFolderPathString);
+        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
+
+        if (!Files.exists(furiousFlingersFolder)) {
+            try {
+                Files.createDirectory(furiousFlingersFolder);
+                Files.createFile(levelsCompletedFilePath);
+                writeToLevelsCompleted(0);
+            } catch (IOException creatingFuriousFlingersFolder) {
+                System.out.println("Error creating Furious Flingers folder");
+                creatingFuriousFlingersFolder.printStackTrace();
+            }
+        }
+
+        if (Files.notExists(levelsCompletedFilePath)) {
+            try {
+                Files.createFile(levelsCompletedFilePath);
+                writeToLevelsCompleted(0);
+            } catch (IOException creatingLevelsCompletedFile) {
+                System.out.println("Error creating levels completed file");
+                creatingLevelsCompletedFile.printStackTrace();
+            }
+        }
+
+        int levelsComplete = 0;
+        try (Scanner scan = new Scanner(levelsCompletedFilePath)) {
+            levelsComplete = Integer.parseInt(scan.nextLine());
+        } catch (IOException readingLevelsCompletedFile) {
+            System.out.println("Error reading levels completed file");
+            readingLevelsCompletedFile.printStackTrace();
+        }
+
+        return levelsComplete;
     }
 }
 

@@ -64,7 +64,7 @@ public class Launcher {
         isProjectileLive = false;
         levelInformation.minusProjectilesRemaining();
         levelInformationUpdater.updateLevelInformationDisplay(levelInformation,levelInformationDisplay);
-        currentProjectile.acceleration = new Vector(0,1000);
+        currentProjectile.acceleration = new Vector(0, launcherType.getGravity());
         double velocityMultiplier = currentProjectile.position.subtract(position).magnitude()/allowedRadius;
         currentProjectile.velocity = position.subtract(currentProjectile.position).unitVector().scalarMultiply(1000*velocityMultiplier);
         currentProjectile.angularVelocity = -Math.signum(currentProjectile.velocity.getX())*currentProjectile.velocity.magnitude()*0.002; //Make it spin clockwise/anticlockwise depending on which way it was launched

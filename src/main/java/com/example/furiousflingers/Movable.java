@@ -18,21 +18,6 @@ public abstract class Movable extends Entity {
     }
 
     public void standardUpdate(double time) {
-
-        if (velocity.magnitude()<15&&Math.abs(angularVelocity)<0.2){
-            numberOfDormantCycles++;
-        } else {
-            numberOfDormantCycles = 0;
-            acceleration = new Vector(0,1000);
-        }
-
-        if (numberOfDormantCycles>9){
-            velocity = new Vector(0,0);
-            angularVelocity = 0;
-            acceleration = new Vector(0,0);
-        }
-        //NEED EXTRA CHECK, DURING COLLISION DETECTION, STORE "SUPPORT AREA", THEN HERE CHECK IF COM PROJECTED ONTO THAT LINE IS INSIDE, IF INSIDE THEN STABLE OTHERWISE ITS A DIAMOND PIVOT
-
         //Updates velocity and position by multiplying their rate of change by the time passed
         //MAGIC GUY ON YT TOLD ME TO ADD HALF ON EITHER SIDE https://www.youtube.com/watch?v=ZOfMA8h4qO8 AT 2:00
         //nvm i get it now, it interpolates the average velocity by just taking the halfway mark and updating the position using that
@@ -57,6 +42,25 @@ public abstract class Movable extends Entity {
         if (this instanceof Polygon){
             ((Polygon) this).updateVerticesOrientations(orientation);
         }
+    }
+
+    public void sleepChecks () {
+        if (velocity.magnitude()<15&&Math.abs(angularVelocity)<0.2){
+            numberOfDormantCycles++;
+        } else {
+            numberOfDormantCycles = 0;
+            acceleration = new Vector(0,1000);
+            if (this instanceof Projectile){
+                ((Projectile) this).addGravity();
+            }
+        }
+
+        if (numberOfDormantCycles>9){
+            velocity = new Vector(0,0);
+            angularVelocity = 0;
+            acceleration = new Vector(0,0);
+        }
+        //NEED EXTRA CHECK, DURING COLLISION DETECTION, STORE "SUPPORT AREA", THEN HERE CHECK IF COM PROJECTED ONTO THAT LINE IS INSIDE, IF INSIDE THEN STABLE OTHERWISE ITS A DIAMOND PIVOT
     }
 
     public abstract void updateAppearance();
