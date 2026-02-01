@@ -10,3 +10,10 @@ circle,wood,500,370,0
 circle,wood,770,410,0
 circle,wood,830,410,0
 circle,wood,800,370,0
+circle,wood,650,190,0
+circle,wood,620,250,0
+circle,wood,680,250,0
+circle,wood,530,330,0
+circle,wood,770,330,0
+circle,wood,560,280,0
+circle,wood,737,280,0

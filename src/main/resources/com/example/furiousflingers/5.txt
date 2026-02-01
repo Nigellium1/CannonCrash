@@ -1,0 +1,4 @@
+0
+4
+rectangle,stone,590,390,0
+rectangle,stone,590,300,0

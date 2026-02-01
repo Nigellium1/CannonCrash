@@ -1,15 +1,17 @@
 package com.example.furiousflingers;
 
 public enum LauncherType implements LoadoutType{
-    DEFAULT("default",1000),
-    RAILGUN("railgun",0);
+    DEFAULT("default",1000,1),
+    RAILGUN("railgun",0,1.5);
 
     private final String name;
     private final int gravity;
+    private final double velocityMultiplier;
 
-    LauncherType(String name, int gravity) {
+    LauncherType(String name, int gravity, double velocityMultiplier) {
         this.name = name;
         this.gravity = gravity;
+        this.velocityMultiplier = velocityMultiplier;
     }
 
     public String getName() {
@@ -18,5 +20,9 @@ public enum LauncherType implements LoadoutType{
 
     public int getGravity() {
         return gravity;
+    }
+
+    public double getVelocityMultiplier() {
+        return velocityMultiplier;
     }
 }

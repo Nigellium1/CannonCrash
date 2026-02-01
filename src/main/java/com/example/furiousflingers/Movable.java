@@ -1,12 +1,15 @@
 package com.example.furiousflingers;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Queue;
 
 public abstract class Movable extends Entity {
 
     protected Vector acceleration;
     private final double pi = Math.PI;
     protected int numberOfDormantCycles;
+    protected Queue<Double> previousCollisionPointsX;
 
     public Movable(Vector position, Vector velocity, Vector acceleration,
                    double orientation, double angularVelocity, Material material) {
@@ -14,7 +17,8 @@ public abstract class Movable extends Entity {
         this.velocity = velocity;
         this.angularVelocity = angularVelocity; //in rad/s, usually pretty big because impulse is usually large (lots of pixels), but around 6 rad is a full rotation so large MOI needed to cancel out
         this.acceleration = acceleration;
-        numberOfDormantCycles = 10;
+        numberOfDormantCycles = 10; //Start asleep
+        previousCollisionPointsX = new ArrayDeque();
     }
 
     public void standardUpdate(double time) {
@@ -45,13 +49,13 @@ public abstract class Movable extends Entity {
     }
 
     public void sleepChecks () {
-        if (velocity.magnitude()<15&&Math.abs(angularVelocity)<0.2){
+        if (isDormant()&&!isPivoting()){
             numberOfDormantCycles++;
-        } else {
+        } else if (!isDormant()){
             numberOfDormantCycles = 0;
             acceleration = new Vector(0,1000);
             if (this instanceof Projectile){
-                ((Projectile) this).addGravity();
+                ((Projectile) this).addGravity(); //Some projectiles/launchers have different to default gravity
             }
         }
 
@@ -61,6 +65,45 @@ public abstract class Movable extends Entity {
             acceleration = new Vector(0,0);
         }
         //NEED EXTRA CHECK, DURING COLLISION DETECTION, STORE "SUPPORT AREA", THEN HERE CHECK IF COM PROJECTED ONTO THAT LINE IS INSIDE, IF INSIDE THEN STABLE OTHERWISE ITS A DIAMOND PIVOT
+    }
+
+    public boolean isDormant () {
+        if (velocity.magnitude()>30){
+            return false;
+        }
+        if (Math.abs(angularVelocity)>0.5){
+            return false;
+        }
+        //^If moving too quickly
+        return true;
+    }
+
+    public boolean isPivoting () {
+        if (!previousCollisionPointsX.isEmpty()) {
+            //If COM is to the right of max support
+            if (position.getX() > getMaxPreviousCollisionX()) {
+//                System.out.println();
+//                System.out.println(position.getX()+" was right of "+ getMaxPreviousCollisionX()+"  ");
+//                System.out.println("Stored collision points:");
+//                for (double val : previousCollisionPointsX){
+//                    System.out.print(((int)val)+",");
+//                }
+//                System.out.println();
+                return true;
+            }
+            //If COM is to the left of min support
+            if (position.getX() < getMinPreviousCollisionX()) {
+//                System.out.println();
+//                System.out.println(position.getX()+" was left of "+ getMinPreviousCollisionX());
+//                System.out.println("Stored collision points:");
+//                for (double val : previousCollisionPointsX){
+//                    System.out.print(((int)val)+",");
+//                }
+//                System.out.println();
+                return true;
+            }
+        }
+        return false;
     }
 
     public abstract void updateAppearance();
@@ -169,5 +212,33 @@ public abstract class Movable extends Entity {
         double rotationalTerm1 = scalar1*scalar1*collisionInformation.getEntity1().reciprocalMomentOfInertia;
         double rotationalTerm2 = scalar2*scalar2*collisionInformation.getEntity2().reciprocalMomentOfInertia;
         return rotationalTerm1 + rotationalTerm2;
+    }
+
+    public void manageCollisionPointsQueue (double xValue) {
+        previousCollisionPointsX.add(xValue);
+        //Store the last N collision points
+        if (previousCollisionPointsX.size()>4){
+            previousCollisionPointsX.remove();
+        }
+    }
+
+    public double getMaxPreviousCollisionX () {
+        double max = previousCollisionPointsX.peek(); //TEMP
+        for (double xValue : previousCollisionPointsX){
+            if (xValue>max){
+                max = xValue;
+            }
+        }
+        return max;
+    }
+
+    public double getMinPreviousCollisionX () {
+        double min = previousCollisionPointsX.peek(); //TEMP
+        for (double xValue : previousCollisionPointsX){
+            if (xValue<min){
+                min = xValue;
+            }
+        }
+        return min;
     }
 }
