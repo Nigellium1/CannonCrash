@@ -124,7 +124,7 @@ public class PhysicsEngine implements ProjectileSpawner {
                 for (Entity entity : entities) {
                     //CollisionInformations contains boolean isColliding, Entity collidingEntity, Vector collisionNormal, and double penetrationDepth
                     if (entity instanceof Movable) {
-                        //Don't do collision detection for unlaunched projectiles
+                        //Don't do collision detection for unlaunched projectiles-
                         if (!(entity instanceof Projectile && !((Projectile) entity).isHasLaunched())){
                             collisionInformationList.addAll(((Movable) entity).detectCollisions(entities));
                         }

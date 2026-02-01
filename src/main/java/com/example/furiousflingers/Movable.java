@@ -10,6 +10,7 @@ public abstract class Movable extends Entity {
     private final double pi = Math.PI;
     protected int numberOfDormantCycles;
     protected Queue<Double> previousCollisionPointsX;
+    protected boolean zeroGravity;
 
     public Movable(Vector position, Vector velocity, Vector acceleration,
                    double orientation, double angularVelocity, Material material) {
@@ -19,6 +20,7 @@ public abstract class Movable extends Entity {
         this.acceleration = acceleration;
         numberOfDormantCycles = 10; //Start asleep
         previousCollisionPointsX = new ArrayDeque();
+        this.zeroGravity = false;
     }
 
     public void standardUpdate(double time) {
@@ -56,6 +58,9 @@ public abstract class Movable extends Entity {
             acceleration = new Vector(0,1000);
             if (this instanceof Projectile){
                 ((Projectile) this).addGravity(); //Some projectiles/launchers have different to default gravity
+            }
+            if (zeroGravity){
+                acceleration = new Vector(0,0);
             }
         }
 
@@ -240,5 +245,9 @@ public abstract class Movable extends Entity {
             }
         }
         return min;
+    }
+
+    public void setZeroGravity(boolean zeroGravity) {
+        this.zeroGravity = zeroGravity;
     }
 }

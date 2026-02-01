@@ -51,6 +51,9 @@ public class Launcher {
         } else if (projectile == ProjectileType.MAGNETIC) {
             currentProjectile = new MagneticProjectile(eventPosition, new Vector(0,0), new Vector(0,0),27,
                     0,0, Material.WOOD, ProjectileType.MAGNETIC);
+        } else if (projectile == ProjectileType.NERD) {
+            currentProjectile = new NerdProjectile(eventPosition, new Vector(0,0), new Vector(0,0),27,
+                    0,0, Material.WOOD, ProjectileType.NERD);
         } else {
             currentProjectile = new Projectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
                     Material.WOOD, ProjectileType.DEFAULT);

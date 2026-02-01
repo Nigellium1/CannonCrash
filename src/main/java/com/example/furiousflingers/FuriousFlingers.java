@@ -205,22 +205,24 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         });
         victoryButtonRow.getChildren().add(victoryReplayButton);
 
-        Button nextLevelButton = createButton("nextLevelButton.png");
-        nextLevelButton.setOnAction(event -> {
-            LevelInformation nextLevelInformation = new LevelInformation();
-            nextLevelInformation.setLevelNumber(levelNumber + 1);
-            PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth, gameHeight, loadoutInformation, nextLevelInformation);
-            StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation,
-                    nextLevelInformation);
-            basePane.getChildren().set(1, gamePane);
-            try {
-                physicsEngine.start();
-            } catch (Exception startingPhysicsEngine) {
-                System.out.println("Error starting physics engine");
-                startingPhysicsEngine.printStackTrace();
-            }
-        });
-        victoryButtonRow.getChildren().add(nextLevelButton);
+        if (levelNumber!=9) {
+            Button nextLevelButton = createButton("nextLevelButton.png");
+            nextLevelButton.setOnAction(event -> {
+                LevelInformation nextLevelInformation = new LevelInformation();
+                nextLevelInformation.setLevelNumber(levelNumber + 1);
+                PhysicsEngine physicsEngine = new PhysicsEngine(gameWidth, gameHeight, loadoutInformation, nextLevelInformation);
+                StackPane gamePane = setupGamePane(physicsEngine, basePane, loadoutInformation,
+                        nextLevelInformation);
+                basePane.getChildren().set(1, gamePane);
+                try {
+                    physicsEngine.start();
+                } catch (Exception startingPhysicsEngine) {
+                    System.out.println("Error starting physics engine");
+                    startingPhysicsEngine.printStackTrace();
+                }
+            });
+            victoryButtonRow.getChildren().add(nextLevelButton);
+        }
 
         victoryPane.getChildren().add(victoryButtonRow);
         victoryButtonRow.setAlignment(Pos.BOTTOM_CENTER);
