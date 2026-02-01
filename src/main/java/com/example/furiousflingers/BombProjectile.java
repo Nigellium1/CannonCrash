@@ -29,7 +29,7 @@ public class BombProjectile extends Projectile {
                     //If within radius
 
                     if (thisToEntityMagnitude<explosionRadius){
-                        ((Movable)entity).velocity = ((Movable)entity).velocity.add(thisToEntityVector.scalarMultiply(5*thisToEntityMagnitude/explosionRadius));
+                        entity.velocity = entity.velocity.add(thisToEntityVector.scalarMultiply(5*thisToEntityMagnitude/explosionRadius));
                     }
                 }
             }

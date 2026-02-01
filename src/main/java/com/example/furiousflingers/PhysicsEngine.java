@@ -111,12 +111,23 @@ public class PhysicsEngine implements ProjectileSpawner {
                     }
                 }
 
+                //Implement magnetic projectile effect
+                for (Entity entity : entities){
+                    if (entity instanceof MagneticProjectile && !((MagneticProjectile) entity).isHasCollided() &&
+                            ((MagneticProjectile) entity).isHasLaunched()){
+                        ((MagneticProjectile) entity).attractMovables(entities);
+                    }
+                }
+
                 //Get collision information
                 ArrayList<CollisionInformation> collisionInformationList = new ArrayList<>();
                 for (Entity entity : entities) {
                     //CollisionInformations contains boolean isColliding, Entity collidingEntity, Vector collisionNormal, and double penetrationDepth
                     if (entity instanceof Movable) {
-                        collisionInformationList.addAll(((Movable) entity).detectCollisions(entities));
+                        //Don't do collision detection for unlaunched projectiles
+                        if (!(entity instanceof Projectile && !((Projectile) entity).isHasLaunched())){
+                            collisionInformationList.addAll(((Movable) entity).detectCollisions(entities));
+                        }
                     }
                 }
 
@@ -176,11 +187,11 @@ public class PhysicsEngine implements ProjectileSpawner {
                 for (CollisionInformation collisionInformation : collisionInformationList) {
                     if (collisionInformation.getEntity1() instanceof Projectile) {
                         ((Projectile) collisionInformation.getEntity1()).addGravity();
-                        ((Projectile) collisionInformation.getEntity1()).setHasCollided(true);
+                        ((Projectile) collisionInformation.getEntity1()).setHasCollided();
                     }
                     if (collisionInformation.getEntity2() instanceof Projectile) {
                         ((Projectile) collisionInformation.getEntity2()).addGravity();
-                        ((Projectile) collisionInformation.getEntity2()).setHasCollided(true);
+                        ((Projectile) collisionInformation.getEntity2()).setHasCollided();
                     }
                 }
 
