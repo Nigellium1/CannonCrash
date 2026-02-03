@@ -67,11 +67,11 @@ public class PhysicsEngine implements ProjectileSpawner {
                 double timeInSecs = now / 1000000000.0 - startTime;
 
                 //Sleep checks for all entities
-                for (Entity entity : entities){
+                for (Entity entity : entities) {
                     //Only movables need to sleep
-                    if (entity instanceof Movable){
-                        if (entity instanceof Projectile){
-                            if (((Projectile) entity).isHasCollided()){
+                    if (entity instanceof Movable) {
+                        if (entity instanceof Projectile) {
+                            if (((Projectile) entity).isHasCollided()) {
                                 ((Projectile) entity).sleepChecks();
                             }
                         } else {
@@ -112,9 +112,9 @@ public class PhysicsEngine implements ProjectileSpawner {
                 }
 
                 //Implement magnetic projectile effect
-                for (Entity entity : entities){
+                for (Entity entity : entities) {
                     if (entity instanceof MagneticProjectile && !((MagneticProjectile) entity).isHasCollided() &&
-                            ((MagneticProjectile) entity).isHasLaunched()){
+                            ((MagneticProjectile) entity).isHasLaunched()) {
                         ((MagneticProjectile) entity).attractMovables(entities);
                     }
                 }
@@ -125,7 +125,7 @@ public class PhysicsEngine implements ProjectileSpawner {
                     //CollisionInformations contains boolean isColliding, Entity collidingEntity, Vector collisionNormal, and double penetrationDepth
                     if (entity instanceof Movable) {
                         //Don't do collision detection for unlaunched projectiles-
-                        if (!(entity instanceof Projectile && !((Projectile) entity).isHasLaunched())){
+                        if (!(entity instanceof Projectile && !((Projectile) entity).isHasLaunched())) {
                             collisionInformationList.addAll(((Movable) entity).detectCollisions(entities));
                         }
                     }
@@ -196,7 +196,7 @@ public class PhysicsEngine implements ProjectileSpawner {
                 }
 
                 //Save collision points x value (used to check if a Movable should be put to sleep or not)
-                for (CollisionInformation collisionInformation : collisionInformationList){
+                for (CollisionInformation collisionInformation : collisionInformationList) {
                     collisionInformation.getEntity1().manageCollisionPointsQueue(collisionInformation.getCollisionPoint().getX());
                 }
 
@@ -261,22 +261,26 @@ public class PhysicsEngine implements ProjectileSpawner {
     }
 
     public void addMovableRectangle(Vector position, Vector velocity, Vector acceleration,
-                                    double width, double height, double orientation, Material material, String imageName) {
+                                    double width, double height, double orientation, Material material,
+                                    String imageName) {
         MovableRectangle rectangle = new MovableRectangle(position, velocity, acceleration, orientation, 0, width, height, material, imageName);
         physicsEnginePane.getChildren().add(rectangle.getRectangle());
         entities.add(rectangle);
     }
 
-    public void addImmovableRectangle(ArrayList<Entity> entities, Vector position, double width, double height, Material material, String imagePath) {
+    public void addImmovableRectangle(Vector position, double width, double height, Material material,
+                                      String imagePath) {
         ImmovableRectangle rectangle = new ImmovableRectangle(position, 0, width, height, material, imagePath);
         ImageView rectangleView = rectangle.getRectangleView();
-        rectangleView.setY(440); //Shift downwards
+        rectangleView.setX(position.getX()-width/2); //Rectangle shape position is top left corner
+        // so I take my center of mass and subtract half width and height to get top left corner
+        rectangleView.setY(position.getY()-height/2);
         physicsEnginePane.getChildren().add(rectangleView);
         entities.add(rectangle);
     }
 
     public void addGround() {
-        addImmovableRectangle(entities, new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth, 60, Material.IMMOVABLE, "floor.png");
+        addImmovableRectangle(new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth, 60, Material.IMMOVABLE, "floor.png");
     }
 
     public Launcher addLauncher() {
@@ -316,14 +320,20 @@ public class PhysicsEngine implements ProjectileSpawner {
                 double orientation = Double.valueOf(instructionArray[4]) * (Math.PI / 180); //Convert back to radians
 
                 if (material == Material.IMMOVABLE) {
-
+                    if (shape.equals("square")) {
+                        addImmovableRectangle(new Vector(xPosition, yPosition), 60, 60,
+                                material, instructionArray[1] + "Square.png");
+                    } else { //Else rectangle
+                        addImmovableRectangle(new Vector(xPosition, yPosition), 120, 60,
+                                material, instructionArray[1] + "Square.png");
+                    }
                 } else if (shape.equals("coin")) {
                     addCoin(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000), orientation, 0, material);
                 } else { //Else movable
                     if (shape.equals("circle")) {
                         addMovableCircle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),
                                 orientation, 0, material, instructionArray[1] + "Circle.png");
-                    } else if(shape.equals("square")) {
+                    } else if (shape.equals("square")) {
                         addMovableRectangle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),
                                 60, 60, orientation, material, instructionArray[1] + "Square.png");
                     } else { //Else rectangle
@@ -346,7 +356,7 @@ public class PhysicsEngine implements ProjectileSpawner {
             endScreen.getChildren().get(0).setVisible(true);
             endScreen.getChildren().get(0).setMouseTransparent(false);
             int levelsCompleted = importLevelsCompleted();
-            writeToLevelsCompleted(Math.max(levelInformation.getLevelNumber() + 1,levelsCompleted));
+            writeToLevelsCompleted(Math.max(levelInformation.getLevelNumber() + 1, levelsCompleted));
         } else {
             endScreen.getChildren().get(1).setVisible(true);
             endScreen.getChildren().get(1).setMouseTransparent(false);
