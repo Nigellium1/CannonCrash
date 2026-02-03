@@ -17,11 +17,11 @@ public class MovableRectangle extends Movable implements Rectangle {
 
     public MovableRectangle(Vector position, Vector velocity, Vector acceleration,
                             double orientation, double angularVelocity, double width, double height,
-                            Material material) {
+                            Material material, String imageName) {
         super(position,velocity,acceleration, orientation, angularVelocity, material);
         this.width = width;
         this.height = height;
-        rectangleView = importImage(material.getImageName());
+        rectangleView = importImage(imageName);
         vertices[0] = position.add(new Vector(-width/2,-height/2));
         vertices[1] = position.add(new Vector(width/2,-height/2));
         vertices[2] = position.add(new Vector(width/2,height/2));

@@ -325,30 +325,43 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
 
         TilePane launcherGrid = new TilePane();
         launcherGrid.setPrefColumns(2);
+
         addLoadoutSelection(LauncherType.DEFAULT, launcherGrid, loadoutInformation,
                 "defaultLauncher.png",true);
+
         boolean railGunUnlocked = false;
         if (levelsUnlocked>=5) railGunUnlocked = true;
         addLoadoutSelection(LauncherType.RAILGUN, launcherGrid, loadoutInformation,
                 "railgunLauncher.png",railGunUnlocked);
+
+        boolean invertedUnlocked = false;
+        if (levelsUnlocked>=6) invertedUnlocked = true;
+        addLoadoutSelection(LauncherType.INVERTED, launcherGrid, loadoutInformation,
+                "invertedLauncher.png",invertedUnlocked);
+
         changeSelectedFrame(loadoutInformation.getLauncher(), launcherGrid);
 
         TilePane projectileGrid = new TilePane();
         projectileGrid.setPrefColumns(2);
+
         addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, loadoutInformation,
                 "defaultProjectile.png",true);
+
         boolean bombUnlocked = false;
         if (levelsUnlocked>=4) bombUnlocked = true;
         addLoadoutSelection(ProjectileType.BOMB, projectileGrid, loadoutInformation,
                 "bombProjectile.png",bombUnlocked);
+
         boolean magneticUnlocked = false;
         if (levelsUnlocked >=6) magneticUnlocked = true;
         addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, loadoutInformation,
                 "magneticProjectile.png",magneticUnlocked);
+
         boolean nerdUnlocked = false;
         if (levelsUnlocked>=10) nerdUnlocked = true;
         addLoadoutSelection(ProjectileType.NERD, projectileGrid, loadoutInformation,
                 "nerdProjectile.png",nerdUnlocked);
+
         changeSelectedFrame(loadoutInformation.getProjectile(), projectileGrid); //Original set frame
 
         HBox gridsWindow = new HBox();
@@ -521,6 +534,9 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
         }
         if (loadoutOption == LauncherType.RAILGUN) {
             ((StackPane) ((Button) grid.getChildren().get(1)).getGraphic()).getChildren().add(loadoutSelectedFrame);
+        }
+        if (loadoutOption == LauncherType.INVERTED) {
+            ((StackPane) ((Button) grid.getChildren().get(2)).getGraphic()).getChildren().add(loadoutSelectedFrame);
         }
 
         if (loadoutOption == ProjectileType.DEFAULT) {

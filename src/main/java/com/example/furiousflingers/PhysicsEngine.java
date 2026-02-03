@@ -237,10 +237,10 @@ public class PhysicsEngine implements ProjectileSpawner {
 //                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
 //                        120,60,0,Material.STONE);
 //            }
-            if (event.isSecondaryButtonDown()) {
-                addMovableRectangle(new Vector(event.getX(), event.getY()), new Vector(0, 0), new Vector(0, 1000),
-                        120, 60, 0, Material.WOOD);
-            }
+//            if (event.isSecondaryButtonDown()) {
+//                addMovableRectangle(new Vector(event.getX(), event.getY()), new Vector(0, 0), new Vector(0, 1000),
+//                        120, 60, 0, Material.WOOD);
+//            }
         });
 
         physicsEnginePane.setOnMouseReleased(event -> {
@@ -261,8 +261,8 @@ public class PhysicsEngine implements ProjectileSpawner {
     }
 
     public void addMovableRectangle(Vector position, Vector velocity, Vector acceleration,
-                                    double width, double height, double orientation, Material material) {
-        MovableRectangle rectangle = new MovableRectangle(position, velocity, acceleration, orientation, 0, width, height, material);
+                                    double width, double height, double orientation, Material material, String imageName) {
+        MovableRectangle rectangle = new MovableRectangle(position, velocity, acceleration, orientation, 0, width, height, material, imageName);
         physicsEnginePane.getChildren().add(rectangle.getRectangle());
         entities.add(rectangle);
     }
@@ -323,9 +323,12 @@ public class PhysicsEngine implements ProjectileSpawner {
                     if (shape.equals("circle")) {
                         addMovableCircle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),
                                 orientation, 0, material, instructionArray[1] + "Circle.png");
+                    } else if(shape.equals("square")) {
+                        addMovableRectangle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),
+                                60, 60, orientation, material, instructionArray[1] + "Square.png");
                     } else { //Else rectangle
                         addMovableRectangle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),
-                                120, 60, orientation, material);
+                                120, 60, orientation, material, instructionArray[1] + "Rectangle.png");
                     }
                 }
             }

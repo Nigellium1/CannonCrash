@@ -3,3 +3,4 @@
 rectangle,stone,590,390,0
 rectangle,stone,590,300,0
 coin,wood,400,400,0
+square,stone,700,410,0

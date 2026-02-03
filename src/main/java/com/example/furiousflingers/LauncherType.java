@@ -2,7 +2,8 @@ package com.example.furiousflingers;
 
 public enum LauncherType implements LoadoutType{
     DEFAULT("default",1000,1),
-    RAILGUN("railgun",0,1.5);
+    RAILGUN("railgun",0,1.5),
+    INVERTED("inverted",-1000,1);
 
     private final String name;
     private final int gravity;
