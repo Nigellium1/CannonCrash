@@ -21,11 +21,11 @@ import java.util.Scanner;
 public class PhysicsEngine implements ProjectileSpawner {
     private final double sceneWidth;
     private final double sceneHeight;
-    private Pane physicsEnginePane;
-    private ArrayList<Entity> entities;
-    private LauncherType launcher;
-    private ProjectileType projectile;
-    private LevelInformation levelInformation;
+    private final Pane physicsEnginePane;
+    private final ArrayList<Entity> entities;
+    private final LauncherType launcher;
+    private final ProjectileType projectile;
+    private final LevelInformation levelInformation;
     private HBox levelInformationDisplay;
     private LevelInformationUpdater levelInformationUpdater;
     private StackPane endScreen;
@@ -47,7 +47,7 @@ public class PhysicsEngine implements ProjectileSpawner {
         return physicsEnginePane;
     }
 
-    public void start() throws Exception {
+    public void start() {
         addGround();
         addLevel(levelInformation.getLevelNumber());
 
@@ -183,14 +183,14 @@ public class PhysicsEngine implements ProjectileSpawner {
                     }
                 }
 
-                //Check projectiles to see if gravity needs to be added (railgun)
+                //Check projectiles to see if gravity needs to be changed (railgun or inverted)
                 for (CollisionInformation collisionInformation : collisionInformationList) {
                     if (collisionInformation.getEntity1() instanceof Projectile) {
-                        ((Projectile) collisionInformation.getEntity1()).addGravity();
+                        collisionInformation.getEntity1().acceleration = new Vector(0,1000);
                         ((Projectile) collisionInformation.getEntity1()).setHasCollided();
                     }
                     if (collisionInformation.getEntity2() instanceof Projectile) {
-                        ((Projectile) collisionInformation.getEntity2()).addGravity();
+                        ((Projectile) collisionInformation.getEntity2()).acceleration = new Vector(0,1000);
                         ((Projectile) collisionInformation.getEntity2()).setHasCollided();
                     }
                 }

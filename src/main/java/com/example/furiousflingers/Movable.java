@@ -10,7 +10,6 @@ public abstract class Movable extends Entity {
     private final double pi = Math.PI;
     protected int numberOfDormantCycles;
     protected Queue<Double> previousCollisionPointsX;
-    protected boolean zeroGravity;
 
     public Movable(Vector position, Vector velocity, Vector acceleration,
                    double orientation, double angularVelocity, Material material) {
@@ -20,7 +19,6 @@ public abstract class Movable extends Entity {
         this.acceleration = acceleration;
         numberOfDormantCycles = 10; //Start asleep
         previousCollisionPointsX = new ArrayDeque();
-        this.zeroGravity = false;
     }
 
     public void standardUpdate(double time) {
@@ -51,25 +49,18 @@ public abstract class Movable extends Entity {
     }
 
     public void sleepChecks () {
-        if (isDormant()&&!isPivoting()){
+        if (isDormant() && !isPivoting()) {
             numberOfDormantCycles++;
-        } else if (!isDormant()){
+        } else if (!isDormant()) {
             numberOfDormantCycles = 0;
-            acceleration = new Vector(0,1000);
-            if (this instanceof Projectile){
-                ((Projectile) this).addGravity(); //Some projectiles/launchers have different to default gravity
-            }
-            if (zeroGravity){
-                acceleration = new Vector(0,0);
-            }
+            acceleration = new Vector(0, 1000);
         }
 
-        if (numberOfDormantCycles>9){
-            velocity = new Vector(0,0);
+        if (numberOfDormantCycles > 9) {
+            velocity = new Vector(0, 0);
             angularVelocity = 0;
-            acceleration = new Vector(0,0);
+            acceleration = new Vector(0, 0);
         }
-        //NEED EXTRA CHECK, DURING COLLISION DETECTION, STORE "SUPPORT AREA", THEN HERE CHECK IF COM PROJECTED ONTO THAT LINE IS INSIDE, IF INSIDE THEN STABLE OTHERWISE ITS A DIAMOND PIVOT
     }
 
     public boolean isDormant () {
@@ -87,24 +78,10 @@ public abstract class Movable extends Entity {
         if (!previousCollisionPointsX.isEmpty()) {
             //If COM is to the right of max support
             if (position.getX() > getMaxPreviousCollisionX()) {
-//                System.out.println();
-//                System.out.println(position.getX()+" was right of "+ getMaxPreviousCollisionX()+"  ");
-//                System.out.println("Stored collision points:");
-//                for (double val : previousCollisionPointsX){
-//                    System.out.print(((int)val)+",");
-//                }
-//                System.out.println();
                 return true;
             }
             //If COM is to the left of min support
             if (position.getX() < getMinPreviousCollisionX()) {
-//                System.out.println();
-//                System.out.println(position.getX()+" was left of "+ getMinPreviousCollisionX());
-//                System.out.println("Stored collision points:");
-//                for (double val : previousCollisionPointsX){
-//                    System.out.print(((int)val)+",");
-//                }
-//                System.out.println();
                 return true;
             }
         }
@@ -245,9 +222,5 @@ public abstract class Movable extends Entity {
             }
         }
         return min;
-    }
-
-    public void setZeroGravity(boolean zeroGravity) {
-        this.zeroGravity = zeroGravity;
     }
 }

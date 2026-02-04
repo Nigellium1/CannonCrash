@@ -29,12 +29,14 @@ public class BombProjectile extends Projectile {
                     //If within radius
 
                     if (thisToEntityMagnitude<explosionRadius){
-                        entity.velocity = entity.velocity.add(thisToEntityVector.scalarMultiply(5*thisToEntityMagnitude/explosionRadius));
+                        entity.velocity = entity.velocity.add(thisToEntityVector.scalarMultiply(
+                                5*thisToEntityMagnitude/explosionRadius));
                     }
                 }
             }
-            removeThisInstance = true; //Tell main loop to remove this
-            return new ArrayList<>(); //Return empty list cus object that was collided with would've been exploded away
+            removeThisInstance = true;//Tell main loop to remove this
+            return new ArrayList<>();
+            //Return empty list cus object that was collided with would've been exploded away
         }
         return collisionInformationList;
     }

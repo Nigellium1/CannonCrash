@@ -14,13 +14,11 @@ public class NerdProjectile extends Projectile{
 
         //Make anything that nerd projectile touches have no gravity
         for (CollisionInformation collisionInformation : collisionInformationList){
-            //Entity 1 is this projectile so only need to do entity 2
+            //Entity 1 is this projectile so only need to do entity 2 (the entities its touched)
             if (collisionInformation.getEntity2() instanceof Movable){
                 ((Movable) collisionInformation.getEntity2()).acceleration = new Vector(0,0);
-                ((Movable) collisionInformation.getEntity2()).setZeroGravity(true);
             }
         }
-
         return collisionInformationList;
     }
 }

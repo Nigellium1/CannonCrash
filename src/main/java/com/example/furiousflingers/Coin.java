@@ -16,7 +16,8 @@ public class Coin extends MovableCircle{
             removeThisInstance = true;
         }
         //Coin "collected" if direct collision with projectile
-        if (collisionInformation.getEntity1() instanceof Projectile || collisionInformation.getEntity2() instanceof Projectile){
+        if (collisionInformation.getEntity1() instanceof Projectile ||
+                collisionInformation.getEntity2() instanceof Projectile){
             removeThisInstance = true;
         }
     }
