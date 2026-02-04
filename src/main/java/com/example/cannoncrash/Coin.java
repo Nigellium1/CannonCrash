@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 public class Coin extends MovableCircle{
     private boolean removeThisInstance;

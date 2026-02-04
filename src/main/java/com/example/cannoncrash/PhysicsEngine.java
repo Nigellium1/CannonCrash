@@ -1,6 +1,6 @@
 //STUFF TO DO: FRICTION, LAUNCHER, NOT BALLS, ROTATIONS
 
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
@@ -378,7 +378,7 @@ public class PhysicsEngine implements ProjectileSpawner {
     public void writeToLevelsCompleted(int levelsCompleted) {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
-        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path furiousFlingersFolder = localAppDataPath.resolve("CannonCrash");
         Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
 
         try (FileWriter fileWriter = new FileWriter(levelsCompletedFilePath.toFile())) {
@@ -392,7 +392,7 @@ public class PhysicsEngine implements ProjectileSpawner {
     public int importLevelsCompleted() {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
-        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path furiousFlingersFolder = localAppDataPath.resolve("CannonCrash");
         Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
 
         if (!Files.exists(furiousFlingersFolder)) {

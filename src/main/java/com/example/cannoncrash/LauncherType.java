@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 public enum LauncherType implements LoadoutType{
     DEFAULT("default",1000,1),

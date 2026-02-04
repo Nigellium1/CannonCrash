@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -18,13 +18,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 
-public class FuriousFlingers extends Application implements LevelInformationUpdater {
+public class CannonCrash extends Application implements LevelInformationUpdater {
     private final double gameWidth = 1000;
     private final double gameHeight = 500;
 
 
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Furious Flingers");
+        primaryStage.setTitle("Cannon Crash");
         primaryStage.show();
         Scene startScene = new Scene(setupBasePane(), gameWidth, gameHeight);
         primaryStage.setScene(startScene);
@@ -455,7 +455,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
 
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
-        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path furiousFlingersFolder = localAppDataPath.resolve("CannonCrash");
         Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
 
         if (!Files.exists(furiousFlingersFolder)) {
@@ -556,7 +556,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     public void writeToLoadoutInformation(LoadoutInformation loadoutInformation) {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
-        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path furiousFlingersFolder = localAppDataPath.resolve("CannonCrash");
         Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
 
         try (FileWriter fileWriter = new FileWriter(loadoutFilePath.toFile())) {
@@ -571,7 +571,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     public int importLevelsCompleted() {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
-        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path furiousFlingersFolder = localAppDataPath.resolve("CannonCrash");
         Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
 
         if (!Files.exists(furiousFlingersFolder)) {
@@ -609,7 +609,7 @@ public class FuriousFlingers extends Application implements LevelInformationUpda
     public void writeToLevelsCompleted(int levelsCompleted) {
         String localAppDataFolderPathString = System.getenv("localappdata");
         Path localAppDataPath = Path.of(localAppDataFolderPathString);
-        Path furiousFlingersFolder = localAppDataPath.resolve("FuriousFlingers");
+        Path furiousFlingersFolder = localAppDataPath.resolve("CannonCrash");
         Path levelsCompletedFilePath = furiousFlingersFolder.resolve("levelsCompleted.txt");
 
         try (FileWriter fileWriter = new FileWriter(levelsCompletedFilePath.toFile())) {

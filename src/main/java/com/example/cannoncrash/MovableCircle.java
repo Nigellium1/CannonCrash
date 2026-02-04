@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,9 +11,9 @@ import java.io.InputStream;
 public class Launcher {
     private final Vector position;
     private final LauncherType launcherType;
-    private ImageView launcherTurretView;
+    private final ImageView launcherTurretView;
     private boolean isProjectileLive; //Is there a valid projectile being dragged right now
-    private ProjectileSpawner projectileSpawner;
+    private final ProjectileSpawner projectileSpawner;
     private Projectile currentProjectile;
     double allowedRadius = 100; //Might change this
 

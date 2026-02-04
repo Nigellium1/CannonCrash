@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 //So I don't pass around strings
 public enum ProjectileType implements LoadoutType{

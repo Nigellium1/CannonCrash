@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 public interface Polygon {
     Vector[] getVertices();

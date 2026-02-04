@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 public enum Material {
     WOOD(0.1,0.4,0.2,1.6,1100),

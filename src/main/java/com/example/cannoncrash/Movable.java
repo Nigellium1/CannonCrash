@@ -1,4 +1,4 @@
-package com.example.furiousflingers;
+package com.example.cannoncrash;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
