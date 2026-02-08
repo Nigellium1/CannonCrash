@@ -136,7 +136,6 @@ public class PhysicsEngine implements ProjectileSpawner {
                     //Remove exploded bombs
                     if (entities.get(i) instanceof BombProjectile) {
                         if (((BombProjectile) entities.get(i)).isRemoveThisInstance()) {
-                            System.out.println("Died at: "+entities.get(i).position.getX());
                             removeEntity(i);
                             i--;
                         }

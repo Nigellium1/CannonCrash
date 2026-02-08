@@ -54,11 +54,11 @@ public class Launcher {
             currentProjectile = new BombProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27,
                     0, 0, Material.WOOD, ProjectileType.BOMB);
         } else if (projectile == ProjectileType.MAGNETIC) {
-            currentProjectile = new MagneticProjectile(eventPosition, new Vector(0,0), new Vector(0,0),27,
-                    0,0, Material.WOOD, ProjectileType.MAGNETIC);
+            currentProjectile = new MagneticProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27,
+                    0, 0, Material.WOOD, ProjectileType.MAGNETIC);
         } else if (projectile == ProjectileType.NERD) {
-            currentProjectile = new NerdProjectile(eventPosition, new Vector(0,0), new Vector(0,0),27,
-                    0,0, Material.WOOD, ProjectileType.NERD);
+            currentProjectile = new NerdProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27,
+                    0, 0, Material.WOOD, ProjectileType.NERD);
         } else {
             currentProjectile = new Projectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
                     Material.WOOD, ProjectileType.DEFAULT);
@@ -87,13 +87,10 @@ public class Launcher {
         currentProjectile.position = position; //Move the projectile onto the centre of the launcher so it looks like it goes out the barrel
 
         //Clear all dots currently in the pane
-        for (AimLineDot aimLineDot : aimLineDotsList){
+        for (AimLineDot aimLineDot : aimLineDotsList) {
             physicsEnginePane.getChildren().remove(aimLineDot.getDotView());
         }
         aimLineDotsList.clear();
-
-        System.out.println("Accel"+currentProjectile.acceleration.getY());
-        System.out.println("velocity "+currentProjectile.velocity.getX()+","+currentProjectile.velocity.getY());
     }
 
     public void handleMouseDragged(MouseEvent event) {
@@ -135,9 +132,9 @@ public class Launcher {
         }
     }
 
-    public void drawAimLine () {
+    public void drawAimLine() {
         //Clear all dots currently in the pane
-        for (AimLineDot aimLineDot : aimLineDotsList){
+        for (AimLineDot aimLineDot : aimLineDotsList) {
             physicsEnginePane.getChildren().remove(aimLineDot.getDotView());
         }
         aimLineDotsList.clear();
@@ -152,29 +149,38 @@ public class Launcher {
 
         //Quadratic with origin at launcher to calculate gap between dots
         //a, b, and c represent coefficients in quadratic formula
-        double a = acceleration.getY()/(2*velocity.getX()*velocity.getX());
-        double b = velocity.getY()/velocity.getX();
-        double c = position.getY()-physicsEnginePane.getHeight()+60;
+        double a = acceleration.getY() / (2 * velocity.getX() * velocity.getX());
+        double b = velocity.getY() / velocity.getX();
+        double c = position.getY() - launcherType.getBorderYValue();
 
-        //Quadratic gives two solutions
-        double solution1 = (-b+Math.sqrt(b*b-4*a*c))/(2*a);
-        double solution2 = (-b-Math.sqrt(b*b-4*a*c))/(2*a);
+        double realSolution = physicsEnginePane.getWidth();
+        //For railgun zero grav
+        if (a == 0) {
+            double potentialSolution = (velocity.getX() * launcherType.getBorderYValue()) / velocity.getY();
+            if (Math.abs(potentialSolution) < realSolution && realSolution/velocity.getX()>0) {
+                realSolution = (velocity.getX() * launcherType.getBorderYValue()) / velocity.getY();
+            }
+        } else {
+            //Quadratic gives two solutions
+            double potentialSolution1 = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+            double potentialSolution2 = (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
 
-        //Solution which gives negative time is eliminated
-        double realSolution = solution1;
-        if (solution1/velocity.getX()<0){
-            realSolution = solution2;
+            //Solution which gives negative time is eliminated
+            realSolution = potentialSolution1;
+            if (potentialSolution1 / velocity.getX() < 0) {
+                realSolution = potentialSolution2;
+            }
         }
-
         //Quadratic with origin at JavaFX origin
-        double xGapBetweenDots = (realSolution/9); //9 gaps so 10 dots
-        for (double x = 0; Math.abs(x) <= Math.abs(realSolution) ; x+=xGapBetweenDots) {
-            double y = a*x*x + b*x + position.getY();
-            AimLineDot aimLineDot = new AimLineDot(new Vector(x+position.getX(),y));
+        double xGapBetweenDots = (realSolution / 9); //9 gaps so 10 dots
+        for (double x = 0; Math.abs(x) <= Math.abs(realSolution); x += xGapBetweenDots) {
+            double y = a * x * x + b * x + position.getY();
+            if (y > physicsEnginePane.getHeight() - 60) {
+                break;
+            } //Don't make dotted line go through the ground
+            AimLineDot aimLineDot = new AimLineDot(new Vector(x + position.getX(), y));
             aimLineDotsList.add(aimLineDot);
             physicsEnginePane.getChildren().add(aimLineDot.getDotView());
         }
-        
-        //FIND OUT WHAT X VALUE THE PROJECTILE HITS THE GROUND AT THEN JUST DIVIDE THAT BY SMTH, MAKE THE LINE GO UNTIL IT GOES OUT OF BOUNDS OF ONE BORDER
     }
 }
