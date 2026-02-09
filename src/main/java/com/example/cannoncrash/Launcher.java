@@ -153,12 +153,15 @@ public class Launcher {
         double b = velocity.getY() / velocity.getX();
         double c = position.getY() - launcherType.getBorderYValue();
 
-        double realSolution = physicsEnginePane.getWidth();
+        double xGapBetweenDots = 100;
         //For railgun zero grav
         if (a == 0) {
-            double potentialSolution = (velocity.getX() * launcherType.getBorderYValue()) / velocity.getY();
-            if (Math.abs(potentialSolution) < realSolution && realSolution/velocity.getX()>0) {
-                realSolution = (velocity.getX() * launcherType.getBorderYValue()) / velocity.getY();
+            double potentialSolution = (velocity.getX()*launcherType.getBorderYValue())/velocity.getY();
+            if (potentialSolution/velocity.getX()>0){
+                //Bound between 100 and -100 to avoid very large gaps when aim is almost parallel to ground
+                xGapBetweenDots = Math.max(Math.min(potentialSolution/30,xGapBetweenDots),-xGapBetweenDots);
+            } else if (velocity.getX()<0) {
+                xGapBetweenDots = xGapBetweenDots*-1;
             }
         } else {
             //Quadratic gives two solutions
@@ -166,14 +169,16 @@ public class Launcher {
             double potentialSolution2 = (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
 
             //Solution which gives negative time is eliminated
-            realSolution = potentialSolution1;
+            double realSolution = potentialSolution1;
             if (potentialSolution1 / velocity.getX() < 0) {
                 realSolution = potentialSolution2;
             }
+            //Quadratic with origin at JavaFX origin
+            xGapBetweenDots = (realSolution / 9); //9 gaps so 10 dots
         }
-        //Quadratic with origin at JavaFX origin
-        double xGapBetweenDots = (realSolution / 9); //9 gaps so 10 dots
-        for (double x = 0; Math.abs(x) <= Math.abs(realSolution); x += xGapBetweenDots) {
+
+        double x = 0;
+        for (int i = 0; i < 10; i++) {
             double y = a * x * x + b * x + position.getY();
             if (y > physicsEnginePane.getHeight() - 60) {
                 break;
@@ -181,6 +186,7 @@ public class Launcher {
             AimLineDot aimLineDot = new AimLineDot(new Vector(x + position.getX(), y));
             aimLineDotsList.add(aimLineDot);
             physicsEnginePane.getChildren().add(aimLineDot.getDotView());
+            x += xGapBetweenDots;
         }
     }
 }
