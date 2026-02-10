@@ -27,7 +27,7 @@ public class MovableRectangle extends Movable implements Rectangle {
         vertices[3] = position.add(new Vector(-width/2,height/2));
     }
 
-    public ImageView getRectangle() {
+    public ImageView getView() {
         return rectangleView;
     }
 
@@ -189,7 +189,6 @@ public class MovableRectangle extends Movable implements Rectangle {
             vectorFromCOMToVertex = vectorFromCOMToVertex.rotate(changeInAngle);
             vertices[i] = position.add(vectorFromCOMToVertex);
         }
-         //THIS NEEDS TO BE DEBUGGED BUT IMA JUST HOPE AND PRAY
     }
 
     public SignificantFaceInformation findFurthestVertexAlongAxis (Vector[]vertices, Vector axis){

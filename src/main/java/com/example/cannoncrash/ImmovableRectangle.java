@@ -24,9 +24,15 @@ public class ImmovableRectangle extends Immovable implements Rectangle {
         vertices[1] = position.add(new Vector(width/2,-height/2));
         vertices[2] = position.add(new Vector(width/2,height/2));
         vertices[3] = position.add(new Vector(-width/2,height/2));
+        rectangleView.setRotate(-orientation*(180/Math.PI));
+        for (int i = 0; i < vertices.length; i++) {
+            Vector vectorFromCOMToVertex = vertices[i].subtract(position);
+            vectorFromCOMToVertex = vectorFromCOMToVertex.rotate(orientation);
+            vertices[i] = position.add(vectorFromCOMToVertex);
+        }
     }
 
-    public ImageView getRectangleView() {
+    public ImageView getView() {
         return rectangleView;
     }
 

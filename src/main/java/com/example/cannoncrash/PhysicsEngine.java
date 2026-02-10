@@ -106,7 +106,7 @@ public class PhysicsEngine implements ProjectileSpawner {
                             }
                         }
 
-                        removeEntity(i);
+                        removeEntity(entities.get(i));
                         i--; //Removed an entity so keep on same i by decrementing
                     }
                 }
@@ -136,14 +136,14 @@ public class PhysicsEngine implements ProjectileSpawner {
                     //Remove exploded bombs
                     if (entities.get(i) instanceof BombProjectile) {
                         if (((BombProjectile) entities.get(i)).isRemoveThisInstance()) {
-                            removeEntity(i);
+                            removeEntity(entities.get(i));
                             i--;
                         }
                     }
                     //Remove collected coins
                     if (entities.get(i) instanceof Coin) {
                         if (((Coin) entities.get(i)).isRemoveThisInstance()) {
-                            removeEntity(i);
+                            removeEntity(entities.get(i));
                             i--;
                             levelInformation.addCoinCollected();
                             levelInformationUpdater.updateLevelInformationDisplay(levelInformation, levelInformationDisplay);
@@ -216,14 +216,14 @@ public class PhysicsEngine implements ProjectileSpawner {
                                  double orientation, double angularVelocity, Material material, String imageName) {
         MovableCircle circle = new MovableCircle(position, velocity, acceleration,
                 27, orientation, angularVelocity, material, imageName);
-        physicsEnginePane.getChildren().add(circle.getCircleView());
+        physicsEnginePane.getChildren().add(circle.getView());
         entities.add(circle);
     }
     //FOR LEFT CLICK SPAWNING CIRLCES TESTING
 
     //So launcher can have the circle it creates
     public void addMovableCircle(MovableCircle circle) {
-        physicsEnginePane.getChildren().add(circle.getCircleView());
+        physicsEnginePane.getChildren().add(circle.getView());
         entities.add(circle);
     }
 
@@ -264,14 +264,14 @@ public class PhysicsEngine implements ProjectileSpawner {
                                     double width, double height, double orientation, Material material,
                                     String imageName) {
         MovableRectangle rectangle = new MovableRectangle(position, velocity, acceleration, orientation, 0, width, height, material, imageName);
-        physicsEnginePane.getChildren().add(rectangle.getRectangle());
+        physicsEnginePane.getChildren().add(rectangle.getView());
         entities.add(rectangle);
     }
 
-    public void addImmovableRectangle(Vector position, double width, double height, Material material,
+    public void addImmovableRectangle(Vector position, double width, double height,double orientation, Material material,
                                       String imagePath) {
-        ImmovableRectangle rectangle = new ImmovableRectangle(position, 0, width, height, material, imagePath);
-        ImageView rectangleView = rectangle.getRectangleView();
+        ImmovableRectangle rectangle = new ImmovableRectangle(position, orientation, width, height, material, imagePath);
+        ImageView rectangleView = rectangle.getView();
         rectangleView.setX(position.getX()-width/2); //Rectangle shape position is top left corner
         // so I take my center of mass and subtract half width and height to get top left corner
         rectangleView.setY(position.getY()-height/2);
@@ -280,7 +280,7 @@ public class PhysicsEngine implements ProjectileSpawner {
     }
 
     public void addGround() {
-        addImmovableRectangle(new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth, 60, Material.IMMOVABLE, "floor.png");
+        addImmovableRectangle(new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth, 60,0, Material.IMMOVABLE, "floor.png");
     }
 
     public Launcher addLauncher() {
@@ -288,15 +288,14 @@ public class PhysicsEngine implements ProjectileSpawner {
         return new Launcher(new Vector(150, 300), physicsEnginePane, projectileSpawner, launcher);
     }
 
-    public void removeEntity(int index) {
-        int differenceInListSizes = Math.abs(physicsEnginePane.getChildren().size() - entities.size());
-        physicsEnginePane.getChildren().remove(index + differenceInListSizes); //Pane includes launcher which isn't part of entities so lists are out of sync by 1
-        entities.remove(index);
+    public void removeEntity(Entity entity) {
+        physicsEnginePane.getChildren().remove(entity.getView()); //Pane includes launcher which isn't part of entities so lists are out of sync by 1
+        entities.remove(entity);
     }
 
     public void addCoin(Vector position, Vector velocity, Vector acceleration, double orientation, double angularVelocity, Material material) {
         Coin coin = new Coin(position, velocity, acceleration, 27, orientation, angularVelocity, material);
-        physicsEnginePane.getChildren().add(coin.getCircleView());
+        physicsEnginePane.getChildren().add(coin.getView());
         entities.add(coin);
     }
 
@@ -321,11 +320,11 @@ public class PhysicsEngine implements ProjectileSpawner {
 
                 if (material == Material.IMMOVABLE) {
                     if (shape.equals("square")) {
-                        addImmovableRectangle(new Vector(xPosition, yPosition), 60, 60,
+                        addImmovableRectangle(new Vector(xPosition, yPosition), 60, 60, orientation,
                                 material, instructionArray[1] + "Square.png");
                     } else { //Else rectangle
-                        addImmovableRectangle(new Vector(xPosition, yPosition), 120, 60,
-                                material, instructionArray[1] + "Square.png");
+                        addImmovableRectangle(new Vector(xPosition, yPosition), 120, 60,orientation,
+                                material, instructionArray[1] + "Rectangle.png");
                     }
                 } else if (shape.equals("coin")) {
                     addCoin(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000), orientation, 0, material);

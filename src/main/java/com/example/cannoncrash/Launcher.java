@@ -42,25 +42,29 @@ public class Launcher {
         this.physicsEnginePane = physicsEnginePane;
     }
 
-    public void handleMousePress(MouseEvent event, ProjectileType projectile) {
+    public void handleMousePress(MouseEvent event, ProjectileType projectileType) {
         Vector eventPosition = new Vector(event.getX(), event.getY());
-        //If click position is outside of circle (approximate circle with radius of half the largest dimension of image
         if (eventPosition.subtract(position).magnitude() > allowedRadius) {
             return;
         }
         isProjectileLive = true;
-        if (projectile == ProjectileType.BOMB) {
-            //Actual image radius is 28 but it looks better if hitbox is slightly smaller than image (no gaps)
-            currentProjectile = new BombProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27,
-                    0, 0, Material.WOOD, ProjectileType.BOMB);
-        } else if (projectile == ProjectileType.MAGNETIC) {
-            currentProjectile = new MagneticProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27,
-                    0, 0, Material.WOOD, ProjectileType.MAGNETIC);
-        } else if (projectile == ProjectileType.NERD) {
-            currentProjectile = new NerdProjectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27,
-                    0, 0, Material.WOOD, ProjectileType.NERD);
+        if (projectileType == ProjectileType.BOMB) {
+            //Actual image radius is 28 but it looks better
+            // if hitbox is slightly smaller than image (no gaps)
+            currentProjectile = new BombProjectile(eventPosition, new Vector(0, 0),
+                    new Vector(0, 0), 27, 0, 0,
+                    Material.WOOD, ProjectileType.BOMB);
+        } else if (projectileType == ProjectileType.MAGNETIC) {
+            currentProjectile = new MagneticProjectile(eventPosition, new Vector(0, 0),
+                    new Vector(0, 0), 27, 0, 0,
+                    Material.WOOD, ProjectileType.MAGNETIC);
+        } else if (projectileType == ProjectileType.NERD) {
+            currentProjectile = new NerdProjectile(eventPosition, new Vector(0, 0),
+                    new Vector(0, 0), 27, 0, 0,
+                    Material.WOOD, ProjectileType.NERD);
         } else {
-            currentProjectile = new Projectile(eventPosition, new Vector(0, 0), new Vector(0, 0), 27, 0, 0,
+            currentProjectile = new Projectile(eventPosition, new Vector(0, 0),
+                    new Vector(0, 0), 27, 0, 0,
                     Material.WOOD, ProjectileType.DEFAULT);
         }
         projectileSpawner.addMovableCircle(currentProjectile);
@@ -83,8 +87,11 @@ public class Launcher {
                 currentProjectile.position.subtract(position).magnitude() / allowedRadius;
         currentProjectile.velocity = position.subtract(currentProjectile.position).unitVector()
                 .scalarMultiply(1000 * velocityMultiplier);
-        currentProjectile.angularVelocity = -Math.signum(currentProjectile.velocity.getX()) * currentProjectile.velocity.magnitude() * 0.002; //Make it spin clockwise/anticlockwise depending on which way it was launched
-        currentProjectile.position = position; //Move the projectile onto the centre of the launcher so it looks like it goes out the barrel
+        currentProjectile.angularVelocity = -Math.signum(currentProjectile.velocity.getX()) *
+                currentProjectile.velocity.magnitude() * 0.002;
+        //Make it spin clockwise/anticlockwise depending on which way it was launched
+        currentProjectile.position = position;
+        //Move the projectile onto the centre of the launcher so it looks like it goes out the barrel
 
         //Clear all dots currently in the pane
         for (AimLineDot aimLineDot : aimLineDotsList) {
@@ -99,9 +106,10 @@ public class Launcher {
         }
 
         Vector eventPosition = new Vector(event.getX(), event.getY());
-        //If outside circle radius 50
+        //If outside circle radius
         if (eventPosition.subtract(position).magnitude() > allowedRadius) {
-            Vector correctedVector = eventPosition.subtract(position).unitVector().scalarMultiply(allowedRadius); //Unit vector then scale by radius so still same direction
+            Vector correctedVector = eventPosition.subtract(position).unitVector().scalarMultiply(allowedRadius);
+            //Unit vector then scale by radius so still same direction
             currentProjectile.position = position.add(correctedVector);
         } else {
             currentProjectile.position = eventPosition;
@@ -112,7 +120,8 @@ public class Launcher {
     }
 
     public void rotateLauncherTurret(Vector mousePosition) {
-        double angle = Math.atan2(mousePosition.getY() - position.getY(), mousePosition.getX() - position.getX());
+        double angle = Math.atan2(mousePosition.getY() - position.getY(),
+                mousePosition.getX() - position.getX());
         //Calculate angle using sohcahtoa (THIS IS CLOCKWISE BECAUSE Y IS DOWNWARDS)
         launcherTurretView.setRotate(180 + angle * (180 / Math.PI));
         //Angle already clockwise so no need to mulitiply by -1
@@ -139,8 +148,8 @@ public class Launcher {
         }
         aimLineDotsList.clear();
 
-        //Acceleration and velocity code taken from handleMouseRelease() so the acceleration and velocity that would be used
-        //Is used to calculate the aim line
+        //Acceleration and velocity code taken from handleMouseRelease() so the acceleration
+        // and velocity that would be used is used to calculate the aim line
         Vector acceleration = new Vector(0, launcherType.getGravity());
         double velocityMultiplier = this.launcherType.getVelocityMultiplier() *
                 currentProjectile.position.subtract(position).magnitude() / allowedRadius;

@@ -18,7 +18,7 @@ public class MovableCircle extends Movable {
         this.circleView = importImage(imageName);
     }
 
-    public ImageView getCircleView() {
+    public ImageView getView() {
         return circleView;
     }
 

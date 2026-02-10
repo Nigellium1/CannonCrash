@@ -1,6 +1,9 @@
 1
-4
-rectangle,immovable,590,390,0
-rectangle,immovable,590,300,0
-coin,wood,400,400,0
-square,stone,700,410,0
+1
+rectangle,immovable,590,380,90
+square,immovable,590,290,0
+square,immovable,590,170,0
+rectangle,immovable,590,80,90
+rectangle,immovable,590,-10,90
+coin,wood,800,410,0
+rectangle,immovable,750,230,90

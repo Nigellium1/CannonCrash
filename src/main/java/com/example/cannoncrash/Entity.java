@@ -1,5 +1,7 @@
 package com.example.cannoncrash;
 
+import javafx.scene.image.ImageView;
+
 public abstract class Entity {
     protected Vector position;
     protected Vector velocity;
@@ -32,4 +34,6 @@ public abstract class Entity {
             reciprocalMomentOfInertia = 1 / momentOfInertia;
         }
     }
+
+    public abstract ImageView getView();
 }
