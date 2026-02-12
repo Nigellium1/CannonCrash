@@ -275,7 +275,7 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
         levelInformationDisplay.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE); //Makes it not take up the whole screen
         levelInformationDisplay.setSpacing(5); //Add spacing between each child
 
-        ImageView projectileView = importImage(loadoutInformation.getProjectile().getName() + "Projectile.png");
+        ImageView projectileView = importImage(loadoutInformation.getProjectileType().getName() + "Projectile.png");
         double projectileOriginalDimension = projectileView.getImage().getHeight();
         projectileView.setFitHeight(projectileOriginalDimension / 2);
         projectileView.setFitWidth(projectileOriginalDimension / 2);
@@ -339,7 +339,7 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
         addLoadoutSelection(LauncherType.INVERTED, launcherGrid, loadoutInformation,
                 "invertedLauncher.png",invertedUnlocked);
 
-        changeSelectedFrame(loadoutInformation.getLauncher(), launcherGrid);
+        changeSelectedFrame(loadoutInformation.getLauncherType(), launcherGrid);
 
         TilePane projectileGrid = new TilePane();
         projectileGrid.setPrefColumns(2);
@@ -362,7 +362,7 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
         addLoadoutSelection(ProjectileType.NERD, projectileGrid, loadoutInformation,
                 "nerdProjectile.png",nerdUnlocked);
 
-        changeSelectedFrame(loadoutInformation.getProjectile(), projectileGrid); //Original set frame
+        changeSelectedFrame(loadoutInformation.getProjectileType(), projectileGrid); //Original set frame
 
         HBox gridsWindow = new HBox();
         gridsWindow.setAlignment(Pos.CENTER);
@@ -384,10 +384,10 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
             Button button = createButton(combinedImages);
             button.setOnAction(event -> {
                 if (loadoutOption instanceof ProjectileType) {
-                    loadoutInformation.setProjectile(((ProjectileType) loadoutOption));
+                    loadoutInformation.setProjectileType(((ProjectileType) loadoutOption));
                 } //Else, has to be a launcher
                 else {
-                    loadoutInformation.setLauncher(((LauncherType) loadoutOption));
+                    loadoutInformation.setLauncherType(((LauncherType) loadoutOption));
                 }
                 writeToLoadoutInformation(loadoutInformation);
                 changeSelectedFrame(loadoutOption, grid); //Change frame whenever any button is pressed
@@ -448,7 +448,7 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
             button.setTranslateY(0);
         });
     }
-    //^AI, google, with some tweaks
+    //^Google AI
 
     public LoadoutInformation importLoadoutInformation() {
         LoadoutInformation loadoutInformation = new LoadoutInformation(LauncherType.DEFAULT, ProjectileType.DEFAULT);
@@ -493,27 +493,27 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
 
         switch (launcher) {
             case "railgun":
-                loadoutInformation.setLauncher(LauncherType.RAILGUN);
+                loadoutInformation.setLauncherType(LauncherType.RAILGUN);
                 break;
             case "inverted":
-                loadoutInformation.setLauncher(LauncherType.INVERTED);
+                loadoutInformation.setLauncherType(LauncherType.INVERTED);
                 break;
             default:
-                loadoutInformation.setLauncher(LauncherType.DEFAULT);
+                loadoutInformation.setLauncherType(LauncherType.DEFAULT);
         }
 
         switch (projectile) {
             case "bomb":
-                loadoutInformation.setProjectile(ProjectileType.BOMB);
+                loadoutInformation.setProjectileType(ProjectileType.BOMB);
                 break;
             case "magnetic":
-                loadoutInformation.setProjectile(ProjectileType.MAGNETIC);
+                loadoutInformation.setProjectileType(ProjectileType.MAGNETIC);
                 break;
             case "nerd":
-                loadoutInformation.setProjectile(ProjectileType.NERD);
+                loadoutInformation.setProjectileType(ProjectileType.NERD);
                 break;
             default:
-                loadoutInformation.setProjectile(ProjectileType.DEFAULT);
+                loadoutInformation.setProjectileType(ProjectileType.DEFAULT);
         }
 
         return loadoutInformation;
@@ -563,8 +563,8 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
         Path loadoutFilePath = furiousFlingersFolder.resolve("loadout.txt");
 
         try (FileWriter fileWriter = new FileWriter(loadoutFilePath.toFile())) {
-            fileWriter.write(loadoutInformation.getLauncher().getName() + "\n");
-            fileWriter.write(loadoutInformation.getProjectile().getName());
+            fileWriter.write(loadoutInformation.getLauncherType().getName() + "\n");
+            fileWriter.write(loadoutInformation.getProjectileType().getName());
         } catch (IOException writingToLoadoutFile) {
             System.out.println("Error writing to loadout file");
             writingToLoadoutFile.printStackTrace();

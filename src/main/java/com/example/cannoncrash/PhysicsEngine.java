@@ -23,8 +23,8 @@ public class PhysicsEngine implements ProjectileSpawner {
     private final double sceneHeight;
     private final Pane physicsEnginePane;
     private final ArrayList<Entity> entities;
-    private final LauncherType launcher;
-    private final ProjectileType projectile;
+    private final LauncherType launcherType;
+    private final ProjectileType projectileType;
     private final LevelInformation levelInformation;
     private HBox levelInformationDisplay;
     private LevelInformationUpdater levelInformationUpdater;
@@ -36,8 +36,8 @@ public class PhysicsEngine implements ProjectileSpawner {
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
         entities = new ArrayList<>();
-        launcher = loadoutInformation.getLauncher();
-        projectile = loadoutInformation.getProjectile();
+        launcherType = loadoutInformation.getLauncherType();
+        projectileType = loadoutInformation.getProjectileType();
         physicsEnginePane = new Pane();
         this.levelInformation = levelInformation;
         setupPane();
@@ -122,7 +122,8 @@ public class PhysicsEngine implements ProjectileSpawner {
                 //Get collision information
                 ArrayList<CollisionInformation> collisionInformationList = new ArrayList<>();
                 for (Entity entity : entities) {
-                    //CollisionInformations contains boolean isColliding, Entity collidingEntity, Vector collisionNormal, and double penetrationDepth
+                    //CollisionInformations contains boolean isColliding, Entity collidingEntity,
+                    // Vector collisionNormal, and double penetrationDepth
                     if (entity instanceof Movable) {
                         //Don't do collision detection for unlaunched projectiles-
                         if (!(entity instanceof Projectile && !((Projectile) entity).isHasLaunched())) {
@@ -172,8 +173,7 @@ public class PhysicsEngine implements ProjectileSpawner {
 
                 //Position correction
                 for (CollisionInformation collisionInformation : collisionInformationList) {
-                    collisionInformation.getEntity1().positionCorrection(collisionInformation.getEntity1(), collisionInformation.getEntity2()
-                            , collisionInformation.getPenetrationDepth(), collisionInformation.getCollisionNormal());
+                    collisionInformation.getEntity1().positionCorrection(collisionInformation);
                 }
 
                 //Update appearance of entities using their position vector
@@ -228,22 +228,22 @@ public class PhysicsEngine implements ProjectileSpawner {
     }
 
     public void addClickFunctionality(Launcher launcher) {
-        physicsEnginePane.setOnMousePressed(event -> {
+        physicsEnginePane.setOnMousePressed(mouseEvent -> {
             if (levelInformation.getProjectilesRemaining() == 0) {
                 return; //If all projectiles used, don't let anymore
             }
-            launcher.handleMousePress(event, projectile);
-//            if (event.isPrimaryButtonDown()){
-//                addMovableRectangle(new Vector(event.getX(),event.getY()),new Vector(0,0),new Vector(0,1000),
+            launcher.handleMousePress(mouseEvent, projectileType);
+//            if (mouseEvent.isPrimaryButtonDown()){
+//                addMovableRectangle(new Vector(mouseEvent.getX(),mouseEvent.getY()),new Vector(0,0),new Vector(0,1000),
 //                        120,60,0,Material.STONE);
 //            }
-//            if (event.isSecondaryButtonDown()) {
-//                addMovableRectangle(new Vector(event.getX(), event.getY()), new Vector(0, 0), new Vector(0, 1000),
+//            if (mouseEvent.isSecondaryButtonDown()) {
+//                addMovableRectangle(new Vector(mouseEvent.getX(), mouseEvent.getY()), new Vector(0, 0), new Vector(0, 1000),
 //                        120, 60, 0, Material.WOOD);
 //            }
         });
 
-        physicsEnginePane.setOnMouseReleased(event -> {
+        physicsEnginePane.setOnMouseReleased(mouseEvent -> {
             launcher.handleMouseRelease(levelInformation, levelInformationDisplay, levelInformationUpdater);
             if (levelInformation.getProjectilesRemaining() == 0) {
                 //5 second delay then end
@@ -255,8 +255,8 @@ public class PhysicsEngine implements ProjectileSpawner {
             }
         });
 
-        physicsEnginePane.setOnMouseDragged(event -> {
-            launcher.handleMouseDragged(event);
+        physicsEnginePane.setOnMouseDragged(mouseEvent -> {
+            launcher.handleMouseDragged(mouseEvent);
         });
     }
 
@@ -280,12 +280,13 @@ public class PhysicsEngine implements ProjectileSpawner {
     }
 
     public void addGround() {
-        addImmovableRectangle(new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth+100, 60,0, Material.IMMOVABLE, "floor.png");
+        addImmovableRectangle(new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth+100,
+                60,0, Material.IMMOVABLE, "floor.png");
     }
 
     public Launcher addLauncher() {
         ProjectileSpawner projectileSpawner = this;
-        return new Launcher(new Vector(150, 300), physicsEnginePane, projectileSpawner, launcher);
+        return new Launcher(new Vector(150, 300), physicsEnginePane, projectileSpawner, launcherType);
     }
 
     public void removeEntity(Entity entity) {
@@ -304,7 +305,9 @@ public class PhysicsEngine implements ProjectileSpawner {
         InputStream inputStream = this.getClass().getResourceAsStream(fileName);
         //First line will be number of coins
         //Second line will be number of projectiles
-        //Line structure: shape, material (includes immovable), position x, position y, orientation (IN DEGREES CUS I DONT KNOW HOW TO WRITE PI)
+        //Third line and beyond describe a structure entity each
+        //Line structure: shape, material (includes immovable), position x, position y, orientation
+        // (Orientation in degrees because if using radians, common orientations like 90 degrees will be an irrational value pi/2 )
         try (Scanner scan = new Scanner(inputStream)) {
             levelInformation.setCoinsInLevel(Integer.valueOf(scan.nextLine()));
             levelInformation.setProjectilesRemaining(Integer.valueOf(scan.nextLine()));
@@ -327,7 +330,8 @@ public class PhysicsEngine implements ProjectileSpawner {
                                 material, instructionArray[1] + "Rectangle.png");
                     }
                 } else if (shape.equals("coin")) {
-                    addCoin(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000), orientation, 0, material);
+                    addCoin(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000), orientation,
+                            0, material);
                 } else { //Else movable
                     if (shape.equals("circle")) {
                         addMovableCircle(new Vector(xPosition, yPosition), new Vector(0, 0), new Vector(0, 1000),

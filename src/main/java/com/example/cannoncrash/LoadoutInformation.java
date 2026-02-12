@@ -2,27 +2,27 @@ package com.example.cannoncrash;
 
 public class LoadoutInformation {
 
-    private LauncherType launcher;
-    private ProjectileType projectile;
+    private LauncherType launcherType;
+    private ProjectileType projectileType;
 
-    public LoadoutInformation(LauncherType launcher, ProjectileType projectile) {
-        this.launcher = launcher;
-        this.projectile = projectile;
+    public LoadoutInformation(LauncherType launcherType, ProjectileType projectileType) {
+        this.launcherType = launcherType;
+        this.projectileType = projectileType;
     }
 
-    public LauncherType getLauncher() {
-        return launcher;
+    public LauncherType getLauncherType() {
+        return launcherType;
     }
 
-    public void setLauncher(LauncherType launcher) {
-        this.launcher = launcher;
+    public void setLauncherType(LauncherType launcherType) {
+        this.launcherType = launcherType;
     }
 
-    public ProjectileType getProjectile() {
-        return projectile;
+    public ProjectileType getProjectileType() {
+        return projectileType;
     }
 
-    public void setProjectile(ProjectileType projectile) {
-        this.projectile = projectile;
+    public void setProjectileType(ProjectileType projectileType) {
+        this.projectileType = projectileType;
     }
 }

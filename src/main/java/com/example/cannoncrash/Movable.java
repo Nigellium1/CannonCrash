@@ -128,7 +128,12 @@ public abstract class Movable extends Entity {
     }
 
     //stops stuff sinking into the floor
-    public void positionCorrection (Entity entity1,Entity entity2, double penetrationDepth, Vector collisionNormal){
+    public void positionCorrection (CollisionInformation collisionInformation){
+        Entity entity1 = collisionInformation.getEntity1();
+        Entity entity2 = collisionInformation.getEntity2();
+        double penetrationDepth = collisionInformation.getPenetrationDepth();
+        Vector collisionNormal = collisionInformation.getCollisionNormal();
+
         final double correctionRatio = 0.2;
         double correctionScalar = penetrationDepth*correctionRatio/
                 (entity1.reciprocalMass+entity2.reciprocalMass);
