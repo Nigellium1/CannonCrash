@@ -495,6 +495,9 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
             case "railgun":
                 loadoutInformation.setLauncher(LauncherType.RAILGUN);
                 break;
+            case "inverted":
+                loadoutInformation.setLauncher(LauncherType.INVERTED);
+                break;
             default:
                 loadoutInformation.setLauncher(LauncherType.DEFAULT);
         }

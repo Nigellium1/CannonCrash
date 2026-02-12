@@ -1,9 +1,9 @@
 package com.example.cannoncrash;
 
 public enum Material {
-    WOOD(0.1,0.4,0.2,1.6,800),
-    STONE(0.2,0.3,0.3,2.0,1200),
-    IMMOVABLE(0,0.3,0.2,0.1,0);
+    WOOD(0.1,0.4,0.2,0.6,200),
+    STONE(0.2,0.3,0.3,0.8,500),
+    IMMOVABLE(0,0.3,0,0,0);
 
     private final double mass;
     private final double restitution;

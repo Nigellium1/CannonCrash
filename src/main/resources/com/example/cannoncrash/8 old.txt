@@ -1,0 +1,14 @@
+3
+2
+rectangle,immovable,400,30,0
+rectangle,immovable,520,30,0
+rectangle,immovable,640,30,0
+rectangle,immovable,370,120,90
+rectangle,immovable,370,240,90
+rectangle,immovable,400,270,0
+rectangle,immovable,520,270,0
+rectangle,immovable,640,270,0
+square,immovable,720,460,22.5
+square,immovable,775,425,45
+square,immovable,810,370,67.5
+square,immovable,823,305,90

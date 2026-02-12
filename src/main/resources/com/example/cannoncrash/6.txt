@@ -11,6 +11,6 @@ coin,wood,670,410,0
 rectangle,immovable,1000,260,90
 coin,wood,600,60,0
 coin,wood,1000,170,0
-coin,wood,50,410,0
+coin,wood,30,410,0
 coin,wood,600,170,0
 coin,wood,750,170,0

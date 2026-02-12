@@ -280,7 +280,7 @@ public class PhysicsEngine implements ProjectileSpawner {
     }
 
     public void addGround() {
-        addImmovableRectangle(new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth, 60,0, Material.IMMOVABLE, "floor.png");
+        addImmovableRectangle(new Vector(sceneWidth / 2, sceneHeight - 30), sceneWidth+100, 60,0, Material.IMMOVABLE, "floor.png");
     }
 
     public Launcher addLauncher() {
