@@ -197,7 +197,7 @@ public class PhysicsEngine implements ProjectileSpawner {
 
                 //Save collision points x value (used to check if a Movable should be put to sleep or not)
                 for (CollisionInformation collisionInformation : collisionInformationList) {
-                    collisionInformation.getEntity1().manageCollisionPointsQueue(collisionInformation.getCollisionPoint().getX());
+                    collisionInformation.getEntity1().addCollisionPointToQueue(collisionInformation.getCollisionPoint().getX());
                 }
 
                 //Set last time for the next cycle

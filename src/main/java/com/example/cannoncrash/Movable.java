@@ -9,7 +9,10 @@ public abstract class Movable extends Entity {
     protected Vector acceleration;
     private final double pi = Math.PI;
     protected int numberOfDormantCycles;
-    protected Queue<Double> previousCollisionPointsX;
+    protected double[] previousPointsQueue;
+    private final int previousPointsQueueCapacity = 4;
+    protected int previousPointsQueueFrontPointer;
+    protected int previousPointsQueueSize;
 
     public Movable(Vector position, Vector velocity, Vector acceleration,
                    double orientation, double angularVelocity, Material material) {
@@ -18,7 +21,9 @@ public abstract class Movable extends Entity {
         this.angularVelocity = angularVelocity; //in rad/s, usually pretty big because impulse is usually large (lots of pixels), but around 6 rad is a full rotation so large MOI needed to cancel out
         this.acceleration = acceleration;
         numberOfDormantCycles = 10; //Start asleep
-        previousCollisionPointsX = new ArrayDeque();
+        previousPointsQueue = new double[4];
+        previousPointsQueueFrontPointer = 0;
+        previousPointsQueueSize = 0;
     }
 
     public void standardUpdate(double time) {
@@ -75,7 +80,7 @@ public abstract class Movable extends Entity {
     }
 
     public boolean isPivoting () {
-        if (!previousCollisionPointsX.isEmpty()) {
+        if (!(previousPointsQueueSize==0)) {
             //If COM is to the right of max support
             if (position.getX() > getMaxPreviousCollisionX()) {
                 return true;
@@ -201,17 +206,22 @@ public abstract class Movable extends Entity {
         return rotationalTerm1 + rotationalTerm2;
     }
 
-    public void manageCollisionPointsQueue (double xValue) {
-        previousCollisionPointsX.add(xValue);
-        //Store the last N collision points
-        if (previousCollisionPointsX.size()>4){
-            previousCollisionPointsX.remove();
+    public void addCollisionPointToQueue (double xValue) {
+        //Place value at calculated rear pointer
+        previousPointsQueue[(previousPointsQueueFrontPointer+previousPointsQueueSize)
+                %previousPointsQueueCapacity]=xValue;
+        if (previousPointsQueueSize<previousPointsQueueCapacity){
+            //If not at full capacity, increment size of queue
+            previousPointsQueueSize++;
+        } else {
+            //If at full capacity, increment front pointer by 1
+            previousPointsQueueFrontPointer = (previousPointsQueueFrontPointer+1)%previousPointsQueueCapacity;
         }
     }
 
     public double getMaxPreviousCollisionX () {
-        double max = previousCollisionPointsX.peek(); //TEMP
-        for (double xValue : previousCollisionPointsX){
+        double max = previousPointsQueue[0]; //TEMP
+        for (double xValue : previousPointsQueue){
             if (xValue>max){
                 max = xValue;
             }
@@ -220,8 +230,8 @@ public abstract class Movable extends Entity {
     }
 
     public double getMinPreviousCollisionX () {
-        double min = previousCollisionPointsX.peek(); //TEMP
-        for (double xValue : previousCollisionPointsX){
+        double min = previousPointsQueue[0]; //TEMP
+        for (double xValue : previousPointsQueue){
             if (xValue<min){
                 min = xValue;
             }
