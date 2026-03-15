@@ -156,10 +156,14 @@ public class MovableRectangle extends Movable implements Rectangle {
                 //Final face clipping
                 //NOT FOLLOWING THE TUTORIAL HERE, IM SCARED I COULD BE LE  FT WITH TWO POINTS IF THE WHOLE FACE IS INSIDE SO INSTEAD IM JUST CHOOSING THE FURTHEST VERTEX ALONG THE NORMAL
                 //Since collision normal points from this to entity, if this is the reference, then I want the point that is furthest towards the reference so -1*collisionNormalDirectionMultiplier (which is like thisIsReference but 0 or 1)
-                SignificantFaceInformation collisionPointInformation = findFurthestVertexAlongAxis(incidentFace,collisionInformation.getCollisionNormal().scalarMultiply(-1*collisionNormalDirectionMultiplier));
+                SignificantFaceInformation collisionPointInformation = findFurthestVertexAlongAxis(incidentFace,
+                        collisionInformation.getCollisionNormal().scalarMultiply(
+                                -1*collisionNormalDirectionMultiplier));
                 Vector collisionPoint = collisionPointInformation.getVertex();
                 if (collisionPointInformation.isEquidistant()){
-                    collisionPoint = incidentFace[0].add((incidentFace[1].subtract(incidentFace[0]).scalarMultiply(0.5))); //Halfway point between both points is collision point if two parallel faces collide
+                    collisionPoint = incidentFace[0].add((incidentFace[1].subtract(
+                            incidentFace[0]).scalarMultiply(0.5)));
+                    //Halfway point between both points is collision point if two parallel faces collide
                 }
                 collisionInformation.setCollisionPoint(collisionPoint);
 
@@ -169,8 +173,10 @@ public class MovableRectangle extends Movable implements Rectangle {
 
         for (CollisionInformation collisionInformation : collisionInformationList){
             collisionInformation.setEntity1(this);
-            collisionInformation.setMomentArm1(collisionInformation.getCollisionPoint().subtract(collisionInformation.getEntity1().position)); //THIS IS WRONG, POSITION ISN'T CENTER OF MASS, YES IT IS NOW
-            collisionInformation.setMomentArm2(collisionInformation.getCollisionPoint().subtract(collisionInformation.getEntity2().position));
+            collisionInformation.setMomentArm1(collisionInformation.getCollisionPoint()
+                    .subtract(collisionInformation.getEntity1().position));
+            collisionInformation.setMomentArm2(collisionInformation.getCollisionPoint()
+                    .subtract(collisionInformation.getEntity2().position));
         }
         return collisionInformationList;
     };
@@ -226,7 +232,8 @@ public class MovableRectangle extends Movable implements Rectangle {
 
     public ArrayList<Vector> addAxis (Vector[] vertices, ArrayList<Vector> axes){
         for (int i = 0; i < vertices.length; i++) {
-            axes.add((vertices[(i+1)%vertices.length].subtract(vertices[i%vertices.length])).unitVector());
+            axes.add((vertices[(i+1)%vertices.length].subtract(
+                    vertices[i%vertices.length])).unitVector());
         }
         return axes;
     }
