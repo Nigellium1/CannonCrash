@@ -59,6 +59,5 @@ public class Vector {
     //Rotates anticlockwise about the origin in radians (matrix multiplication)
     public Vector rotate (double angle){
         return new Vector(Math.cos(angle)*x+Math.sin(angle)*y,-Math.sin(angle)*x+Math.cos(angle)*y);
-        //IF THIS IS MESSED UP WERID SHIT HAPPENS
     }
 }

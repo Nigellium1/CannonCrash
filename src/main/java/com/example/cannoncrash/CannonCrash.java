@@ -22,7 +22,6 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
     private final double gameWidth = 1000;
     private final double gameHeight = 500;
 
-
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Cannon Crash");
         primaryStage.show();
@@ -103,7 +102,6 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
                 ImageView level = importImage("Level" + levelCounter + ".png");
                 level.setOpacity(0.70); //Fade the level
                 StackPane.setAlignment(lock, Pos.TOP_RIGHT); //Put lock in top right
-                //Small margin
                 StackPane combinedImages = new StackPane(level, lock);
                 buttonsWindow.getChildren().add(combinedImages);
                 levelCounter++;
@@ -205,7 +203,8 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
         });
         victoryButtonRow.getChildren().add(victoryReplayButton);
 
-        if (levelNumber!=9) {
+        //Last level shouldn't have next level button
+        if (levelNumber != 9) {
             Button nextLevelButton = createButton("nextLevelButton.png");
             nextLevelButton.setOnAction(event -> {
                 LevelInformation nextLevelInformation = new LevelInformation();
@@ -282,7 +281,7 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
 
         levelInformationDisplay.getChildren().add(projectileView);
         levelInformationDisplay.getChildren().add(importImage("X.png"));
-        levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp values
+        levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp value
 
         ImageView coinView = importImage("coin.png");
         double coinOriginalDimension = coinView.getImage().getHeight();
@@ -291,13 +290,14 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
 
         levelInformationDisplay.getChildren().add(coinView);
         levelInformationDisplay.getChildren().add(importImage("X.png"));
-        levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp values
+        levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp value
         levelInformationDisplay.getChildren().add(importImage("slash.png"));
         levelInformationDisplay.getChildren().add(makeNumberIntoSingleNode(0)); //Temp value
 
         return levelInformationDisplay;
     }
 
+    //Takes in int and returns images combined to make that number as a node
     public HBox makeNumberIntoSingleNode(int number) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
@@ -327,17 +327,17 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
         launcherGrid.setPrefColumns(2);
 
         addLoadoutSelection(LauncherType.DEFAULT, launcherGrid, loadoutInformation,
-                "defaultLauncher.png",true);
+                "defaultLauncher.png", true);
 
         boolean railGunUnlocked = false;
-        if (levelsUnlocked>=5) railGunUnlocked = true;
+        if (levelsUnlocked >= 5) railGunUnlocked = true;
         addLoadoutSelection(LauncherType.RAILGUN, launcherGrid, loadoutInformation,
-                "railgunLauncher.png",railGunUnlocked);
+                "railgunLauncher.png", railGunUnlocked);
 
         boolean invertedUnlocked = false;
-        if (levelsUnlocked>=6) invertedUnlocked = true;
+        if (levelsUnlocked >= 6) invertedUnlocked = true;
         addLoadoutSelection(LauncherType.INVERTED, launcherGrid, loadoutInformation,
-                "invertedLauncher.png",invertedUnlocked);
+                "invertedLauncher.png", invertedUnlocked);
 
         changeSelectedFrame(loadoutInformation.getLauncherType(), launcherGrid);
 
@@ -345,22 +345,22 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
         projectileGrid.setPrefColumns(2);
 
         addLoadoutSelection(ProjectileType.DEFAULT, projectileGrid, loadoutInformation,
-                "defaultProjectile.png",true);
+                "defaultProjectile.png", true);
 
         boolean bombUnlocked = false;
-        if (levelsUnlocked>=4) bombUnlocked = true;
+        if (levelsUnlocked >= 4) bombUnlocked = true;
         addLoadoutSelection(ProjectileType.BOMB, projectileGrid, loadoutInformation,
-                "bombProjectile.png",bombUnlocked);
+                "bombProjectile.png", bombUnlocked);
 
         boolean magneticUnlocked = false;
-        if (levelsUnlocked >=6) magneticUnlocked = true;
+        if (levelsUnlocked >= 6) magneticUnlocked = true;
         addLoadoutSelection(ProjectileType.MAGNETIC, projectileGrid, loadoutInformation,
-                "magneticProjectile.png",magneticUnlocked);
+                "magneticProjectile.png", magneticUnlocked);
 
         boolean nerdUnlocked = false;
-        if (levelsUnlocked>=10) nerdUnlocked = true;
+        if (levelsUnlocked >= 10) nerdUnlocked = true;
         addLoadoutSelection(ProjectileType.NERD, projectileGrid, loadoutInformation,
-                "nerdProjectile.png",nerdUnlocked);
+                "nerdProjectile.png", nerdUnlocked);
 
         changeSelectedFrame(loadoutInformation.getProjectileType(), projectileGrid); //Original set frame
 
@@ -397,8 +397,8 @@ public class CannonCrash extends Application implements LevelInformationUpdater 
             background.setOpacity(0.7);
             loadoutChoiceView.setOpacity(0.7);
             ImageView lock = importImage("lock.png");
-            StackPane.setAlignment(lock,Pos.TOP_RIGHT);
-            StackPane combinedImages = new StackPane(background,loadoutChoiceView,lock);
+            StackPane.setAlignment(lock, Pos.TOP_RIGHT);
+            StackPane combinedImages = new StackPane(background, loadoutChoiceView, lock);
             grid.getChildren().add(combinedImages);
         }
     }

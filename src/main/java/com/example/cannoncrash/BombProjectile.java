@@ -27,7 +27,6 @@ public class BombProjectile extends Projectile {
                     Vector thisToEntityVector = entity.position.subtract(position);
                     double thisToEntityMagnitude = thisToEntityVector.magnitude();
                     //If within radius
-
                     if (thisToEntityMagnitude<explosionRadius){
                         entity.velocity = entity.velocity.add(thisToEntityVector.scalarMultiply(
                                 5*thisToEntityMagnitude/explosionRadius));

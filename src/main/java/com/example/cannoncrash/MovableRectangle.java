@@ -46,29 +46,30 @@ public class MovableRectangle extends Movable implements Rectangle {
                 continue;
             }
             ArrayList<Vector> axes = new ArrayList<Vector>(); //Axes to be used for SAT
-            //Add axes of shape 1, (kinda cheated cus ur supposed to use the normals but since its a rectangle, the normals are just the perpendicular sides)
+            //Add axes of shape 1, used faces instead of normals as they are perpendicular
             axes = addAxis(vertices,axes);
 
             //Rectangle checks (MIGHT EXTEND THIS TO POLYGON CHECKS)
             if (entity instanceof Rectangle){
                 boolean isColliding = true;
-                double smallestOverlap = Double.MAX_VALUE; //This might be bad but declare as largest possible double value so first overlap overwrites it
+                double smallestOverlap = Double.MAX_VALUE;
                 Vector smallestOverlapAxis = new Vector(0,0); //This will get overridden the values mean nothing
                 axes = addAxis(((Polygon) entity).getVertices(),axes);
                 boolean thisIsReferenceEntity = true;
                 for (int i = 0; i < axes.size(); i++) {
-                    //Dot product to find how far along the point is when projected onto the vector
                     Vector entity1MaxVertex = findFurthestVertexAlongAxis(vertices,axes.get(i)).getVertex();
                     Vector entity2MaxVertex = findFurthestVertexAlongAxis(((Polygon)entity).getVertices(),axes.get(i)).getVertex();
                     Vector entity1MinVertex = findFurthestVertexAlongAxis(vertices,axes.get(i).scalarMultiply(-1)).getVertex();
-                    Vector entity2MinVertex = findFurthestVertexAlongAxis(((Polygon)entity).getVertices(),axes.get(i).scalarMultiply(-1)).getVertex();
+                    Vector entity2MinVertex = findFurthestVertexAlongAxis(((Polygon)entity).getVertices(),axes.get(i)
+                            .scalarMultiply(-1)).getVertex();
 
                     double entity1Max = entity1MaxVertex.dotProduct(axes.get(i));
                     double entity1Min = entity1MinVertex.dotProduct(axes.get(i));
                     double entity2Max = entity2MaxVertex.dotProduct(axes.get(i));
                     double entity2Min = entity2MinVertex.dotProduct(axes.get(i));
 
-                    //Check max and mins for overlap, if entity1 is completely left of entity2, or entity1 is completley right of entity2 - no collision
+                    //Check max and mins for overlap, if entity1 is completely left of entity2,
+                    // or entity1 is completley right of entity2 - no collision
                     if (entity1Max < entity2Min || entity1Min > entity2Max){
                         isColliding = false;
                         break;
@@ -79,7 +80,8 @@ public class MovableRectangle extends Movable implements Rectangle {
                     if (overlap < smallestOverlap){
                         smallestOverlap = overlap;
                         smallestOverlapAxis = axes.get(i);
-                        //Since this is a rectangle, if the axis was one of the first 4, then the reference entity will be this, otherwise it is entity
+                        //Since this is a rectangle, if the axis was one of the first 4,
+                        // then the reference entity will be this, otherwise it is the other entity
                         if (i<=3){
                             thisIsReferenceEntity = true;
                         } else {
@@ -112,7 +114,7 @@ public class MovableRectangle extends Movable implements Rectangle {
                 collisionInformation.setPenetrationDepth(smallestOverlap);
                 collisionInformation.setCollisionNormal(smallestOverlapAxis);
 
-                //add wacky collision point stuff
+                //Collision point stuff
                 //Allocate reference and incident vertices
                 Vector[] referenceVertices;
                 Vector[] incidentVertices;
@@ -147,14 +149,14 @@ public class MovableRectangle extends Movable implements Rectangle {
                 incidentFace[1] = findOtherVertexOfMostPerpendicularFace(significantFaceInformation2.getVertex(),
                         incidentVertices[Math.floorMod(significantFaceInformation2.getIndex() + 1, 4)],
                         incidentVertices[Math.floorMod(significantFaceInformation2.getIndex() - 1, 4)],
-                        collisionInformation.getCollisionNormal()); //THIS IS BAD PROBS BUT IVE JUST ADDED 4 TO MAKE IT THE SECOND SHAPE IN VERTICES
+                        collisionInformation.getCollisionNormal()); //Add 4 to make it the second shape
 
                 //Adjacent face clipping
                 incidentFace = clipFace(referenceFace[1].subtract(referenceFace[0]),referenceFace[0],incidentFace); //"Left" side clipping
                 incidentFace = clipFace(referenceFace[0].subtract(referenceFace[1]),referenceFace[1],incidentFace); //Other adjacent side clipping
 
                 //Final face clipping
-                //NOT FOLLOWING THE TUTORIAL HERE, IM SCARED I COULD BE LE  FT WITH TWO POINTS IF THE WHOLE FACE IS INSIDE SO INSTEAD IM JUST CHOOSING THE FURTHEST VERTEX ALONG THE NORMAL
+                //Instead of clipping points like the research paper, just choosing furthest along normal to avoid ending up with multiple collision points
                 //Since collision normal points from this to entity, if this is the reference, then I want the point that is furthest towards the reference so -1*collisionNormalDirectionMultiplier (which is like thisIsReference but 0 or 1)
                 SignificantFaceInformation collisionPointInformation = findFurthestVertexAlongAxis(incidentFace,
                         collisionInformation.getCollisionNormal().scalarMultiply(
@@ -283,9 +285,3 @@ public class MovableRectangle extends Movable implements Rectangle {
         }
     }
 }
-
-//TO DO LIT: ADD COLLISION POINT TO COLLISION INFORMATION THEN, STONKS?? YOU ALSO GOTTA UPDATE THE SHAPE VERTICES YOU BUFOON, YOU DIDNT UPDATE THE VERTICES, NOW LOOK WHAT YOUVE DONE IT DOESNT WORK CUS IT THINKS THE RECTANGLES HAVEN'T MOVEDS
-//WHEN YOU ROTATE RECTANGLE, IT ROTATES ABOUT ITS CENTRE BUT POSITION STAYS THE TOP LEFT CORNER
-//REMEMBER WHEN I GENERATE RECTANGLES, IT ASSUMES THE RECTANGLE IS NOT ORIENTATED, IF I WANT TO SPAWN IT ORIENTATED THEN VERTICES[] WILL BREAK
-
-//SQUARES CAN STILL PENETRATE INTO FLOOR, ONLY RESOLVES WHEN IT ROTATES ONTO TIP LIKE DIAMOND???

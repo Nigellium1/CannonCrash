@@ -1,8 +1,6 @@
 package com.example.cannoncrash;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Queue;
 
 public abstract class Movable extends Entity {
 
@@ -28,8 +26,7 @@ public abstract class Movable extends Entity {
 
     public void standardUpdate(double time) {
         //Updates velocity and position by multiplying their rate of change by the time passed
-        //MAGIC GUY ON YT TOLD ME TO ADD HALF ON EITHER SIDE https://www.youtube.com/watch?v=ZOfMA8h4qO8 AT 2:00
-        //nvm i get it now, it interpolates the average velocity by just taking the halfway mark and updating the position using that
+        //Interpolates the average velocity by just taking the halfway mark and updating the position using that
         velocity = velocity.add(acceleration.scalarMultiply(time * 0.5));
         position = position.add(velocity.scalarMultiply(time));
         velocity = velocity.add(acceleration.scalarMultiply(time * 0.5));
@@ -194,7 +191,6 @@ public abstract class Movable extends Entity {
         Vector entity1PointVelocity = entity1.velocity.add(momentArm1.vectorScalarCrossProduct(entity1.angularVelocity));
         Vector entity2PointVelocity = entity2.velocity.add(momentArm2.vectorScalarCrossProduct(entity2.angularVelocity));
         Vector relativeVelocity = entity1PointVelocity.subtract(entity2PointVelocity);
-//        System.out.println("entity 1:"+ entity1.velocity.getX()+"other thing:"+momentArm1.vectorScalarcrossProduct(entity1.angularVelocity).getX());
         return relativeVelocity;
     }
 

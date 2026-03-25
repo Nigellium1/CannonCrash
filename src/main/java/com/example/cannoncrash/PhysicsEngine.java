@@ -219,7 +219,6 @@ public class PhysicsEngine implements ProjectileSpawner {
         physicsEnginePane.getChildren().add(circle.getView());
         entities.add(circle);
     }
-    //FOR LEFT CLICK SPAWNING CIRLCES TESTING
 
     //So launcher can have the circle it creates
     public void addMovableCircle(MovableCircle circle) {
@@ -234,12 +233,12 @@ public class PhysicsEngine implements ProjectileSpawner {
             }
             launcher.handleMousePress(mouseEvent, projectileType);
 //            if (mouseEvent.isPrimaryButtonDown()){
-//                addMovableRectangle(new Vector(mouseEvent.getX(),mouseEvent.getY()),new Vector(0,0),new Vector(0,1000),
-//                        120,60,0,Material.STONE);
+//                addMovableCircle(new Vector(mouseEvent.getX(),mouseEvent.getY()),new Vector(0,0),new Vector(0,1000)
+//                ,0,0,Material.TEST,"stoneCircle.png");
 //            }
 //            if (mouseEvent.isSecondaryButtonDown()) {
-//                addMovableRectangle(new Vector(mouseEvent.getX(), mouseEvent.getY()), new Vector(0, 0), new Vector(0, 1000),
-//                        120, 60, 0, Material.WOOD);
+//                addMovableRectangle(new Vector(mouseEvent.getX(), mouseEvent.getY()), new Vector(0, 0),
+//                        new Vector(0, 0), 120, 60, 0, Material.IMMOVABLE,"immovableRectangle.png");
 //            }
         });
 
@@ -430,5 +429,3 @@ public class PhysicsEngine implements ProjectileSpawner {
         return levelsComplete;
     }
 }
-
-//DO LEVELS

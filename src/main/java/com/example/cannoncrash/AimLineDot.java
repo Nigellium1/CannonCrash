@@ -8,10 +8,8 @@ import java.io.InputStream;
 public class AimLineDot {
     private final double  radius = 5;
     private final ImageView dotView = importImage("aimLineDot.png");
-    private final Vector position;
 
     public AimLineDot(Vector position) {
-        this.position = position;
         dotView.setX(position.getX()-radius); //Cus imageview coords are top left
         dotView.setY(position.getY()-radius);
     }

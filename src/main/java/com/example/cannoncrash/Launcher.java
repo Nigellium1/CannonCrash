@@ -16,7 +16,7 @@ public class Launcher {
     private boolean isProjectileLive; //Is there a valid projectile being dragged right now
     private final ProjectileSpawner projectileSpawner;
     private Projectile currentProjectile;
-    private final double allowedRadius = 100; //Might change this
+    private final double allowedRadius = 100; //Radius which the player is allowed to drag
     private final ArrayList<AimLineDot> aimLineDotsList;
     private final Pane physicsEnginePane;
 
